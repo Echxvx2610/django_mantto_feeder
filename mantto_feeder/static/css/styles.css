@@ -1,0 +1,109 @@
+.titulo_principal{
+    color:rgb(17, 73, 87);
+    font-weight: bold;
+    font-size: 30px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.centrar{
+    text-align: center;
+}
+
+.box_home{
+    margin:0 auto;
+    width: 500px;
+    padding: 20px;
+}
+
+
+.navbar {
+    position: top;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; 
+    background-color: #333;
+    color: white;
+    padding: 10px;
+}
+
+
+/* Estilo general del container */
+.container {
+    width: 80%;
+    max-width: 900px;
+    min-width: 600px; /* Ancho mínimo para evitar que se deforme */
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 60px auto;
+}
+
+/* Aseguramos que el canvas tenga un fondo visible */
+canvas {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    width: 100%; /* Asegura que ocupe todo el espacio disponible */
+    height: 30px; /* Altura fija para mantener proporciones */
+}
+
+/* Layout de dos columnas por defecto (desktop) */
+.header,
+.info {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* Cada sección de información con un ancho específico */
+.info .left,
+.info .center,
+.info .right {
+    width: 30%; /* Ocupa el 30% del contenedor */
+}
+
+/* Ajuste de dropdowns en desktop */
+.dropdowns {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* Media query: Cambios en pantallas pequeñas */
+@media (max-width: 600px) {
+    .container {
+        width: 100%; /* Ocupa todo el ancho disponible */
+        min-width: 100%; /* Evita espacios vacíos en móviles */
+        padding: 10px;
+    }
+
+    /* Secciones apiladas verticalmente */
+    .header,
+    .info,
+    .dropdowns {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Cada sección ocupa todo el ancho disponible */
+    .info .left,
+    .info .center,
+    .info .right {
+        width: 100%; 
+        margin-bottom: 10px;
+    }
+
+    /* Botones y dropdowns en vertical */
+    button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .dropdowns select {
+        width: 100%;
+    }
+}

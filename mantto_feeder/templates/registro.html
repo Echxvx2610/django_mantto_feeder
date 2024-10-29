@@ -1,0 +1,105 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <form class="row gx-3 gy-2 align-items-center">
+        <!-- Data -->
+        <div class="col-md-6">
+            <label for="data" class="form-label">Data</label>
+            <input type="text" class="form-control" id="data" placeholder="Buscar por ID" maxlength="9">
+        </div>
+
+        <!-- Color de la Semana -->
+        <div class="col-md-6">
+            <label for="color-semana" class="form-label">Color Semana</label>
+            <input type="text" class="form-control" id="color-semana" placeholder="Buscar por ID" /> 
+        </div>
+
+        <!-- ID_Feeder -->
+        <div class="col-md-6">
+            <label for="id-feeder" class="form-label">ID_Feeder</label>
+            <input type="text" class="form-control" id="id-feeder" placeholder="Valor extraído de datos" disabled/>
+        </div>
+
+        <!-- Feeder -->
+        <div class="col-md-6">
+            <label for="feeder" class="form-label">Feeder</label>
+            <input type="text" class="form-control" id="feeder" placeholder="Datos de feeder extraído" disabled/>
+        </div>
+
+        <!-- Técnico -->
+        <div class="col-md-6">
+            <label for="tecnico" class="form-label">Técnico</label>
+            <input type="text" class="form-control" id="tecnico" placeholder="Valor extraído de datos" disabled/>
+        </div>
+
+        <!-- Calibración -->
+        <div class="col-md-6">
+            <label class="form-label">Calibración</label>
+            <canvas id="calibracion-canvas" class="w-100 border rounded" height="30"></canvas>
+        </div>
+
+        <!-- Status -->
+        <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <canvas id="status-canvas" class="w-100 border rounded" height="30"></canvas>
+        </div>
+
+        <!-- CP -->
+        <div class="col-md-6">
+            <label for="cp" class="form-label">CP</label>
+            <select id="cp" class="form-select">
+                <option value="NG">NG</option>
+                <option value="OK">OK</option>
+            </select>
+        </div>
+
+        <!-- QP -->
+        <div class="col-md-6">
+            <label for="qp" class="form-label">QP</label>
+            <select id="qp" class="form-select">
+                <option value="NG">NG</option>
+                <option value="OK">OK</option>
+            </select>
+        </div>
+
+        <!-- Hover -->
+        <div class="col-md-6">
+            <label for="hover" class="form-label">Hover</label>
+            <select id="hover" class="form-select">
+                <option value="NG">NG</option>
+                <option value="OK">OK</option>
+            </select>
+        </div>
+
+        <!-- BFC -->
+        <div class="col-md-6">
+            <label for="bfc" class="form-label">BFC</label>
+            <select id="bfc" class="form-select">
+                <option value="NG">NG</option>
+                <option value="OK">OK</option>
+            </select>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="col-12">
+            <label for="observaciones" class="form-label">Observaciones</label>
+            <textarea id="observaciones" rows="4" class="form-control"></textarea>
+        </div>
+
+        <!-- Footer -->
+        <div class="col-12 text-center mt-3">
+            <p class="text-muted">Created by: Cristian Echevarria</p>
+        </div>
+    </form>
+</div>
+
+<!-- Funciones javascript-->
+<script>
+
+    function searchData() {
+    }
+</script>
+{% endblock %}
