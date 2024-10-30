@@ -4,35 +4,45 @@
 
 {% block content %}
 <div class="container my-4">
-    <form class="row gx-3 gy-2 align-items-center">
-        <!-- Data -->
+    <form class="row gx-3 gy-2 align-items-center" method="GET" action="/consultar/">
+        <!-- ID Feeder para consultar datos-->
         <div class="col-md-6">
             <label for="data" class="form-label">Data</label>
-            <input type="text" class="form-control" id="data" placeholder="Buscar por ID" maxlength="9">
+            <input type="text" class="form-control" id="data" name="feeder_id" placeholder="Buscar por ID"
+                maxlength="9">
         </div>
 
         <!-- Color de la Semana -->
         <div class="col-md-6">
             <label for="color-semana" class="form-label">Color Semana</label>
-            <input type="text" class="form-control" id="color-semana" placeholder="Buscar por ID" /> 
+            <input type="text" class="form-control" id="color-semana" disabled />
         </div>
 
         <!-- ID_Feeder -->
         <div class="col-md-6">
             <label for="id-feeder" class="form-label">ID_Feeder</label>
-            <input type="text" class="form-control" id="id-feeder" placeholder="Valor extraído de datos" disabled/>
+            <input type="text" class="form-control" id="id-feeder" disabled />
+        </div>
+        <!-- Color Feeder -->
+        <div class="col-md-6">
+            <label for="color-feeder" class="form-label">Color Feeder</label>
+            <input type="text" class="form-control" id="color-feeder" disabled />
         </div>
 
         <!-- Feeder -->
         <div class="col-md-6">
             <label for="feeder" class="form-label">Feeder</label>
-            <input type="text" class="form-control" id="feeder" placeholder="Datos de feeder extraído" disabled/>
+            <input type="text" class="form-control" id="feeder" disabled />
         </div>
-
+        <!-- Codigo Feeder -->
+        <div class="col-md-6">
+            <label for="codigo-feeder" class="form-label">Código Feeder</label>
+            <input type="text" class="form-control" id="codigo-feeder" disabled />
+        </div>
         <!-- Técnico -->
         <div class="col-md-6">
             <label for="tecnico" class="form-label">Técnico</label>
-            <input type="text" class="form-control" id="tecnico" placeholder="Valor extraído de datos" disabled/>
+            <input type="text" class="form-control" id="tecnico" disabled />
         </div>
 
         <!-- Calibración -->
@@ -96,10 +106,69 @@
     </form>
 </div>
 
-<!-- Funciones javascript-->
 <script>
+    let debounceTimeout;  // Definir variable de debounce en el ámbito global del script
 
-    function searchData() {
+    // Manejo del evento Enter para buscar feeder info con debounce
+    document.getElementById('data').addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();  // Evitar recarga de la página
+            clearTimeout(debounceTimeout);  // Limpiar cualquier timeout previo
+            debounceTimeout = setTimeout(fetchFeederInfo, 300);  // Esperar 300ms antes de ejecutar
+        }
+    });
+
+    function showAlert(title, message, icon = 'info') {
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: icon,
+            confirmButtonText: 'Aceptar',
+        });
+    }
+
+    function fetchFeederInfo() {
+        const feederId = document.getElementById('data').value.trim();
+
+        if (!feederId) {
+            showAlert('Campo vacío', 'Por favor, introduce un ID de feeder', 'warning');
+            return;  // Evitar ejecución si el campo está vacío
+        }
+
+        fetch(`/consultar/?feeder_id=${feederId}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 500) {
+                        throw new Error('Feeder no encontrado. Introduce un ID de feeder correcto');
+                    } else if (response.status === 400) {
+                        throw new Error('Introduce un valor numérico para el ID de feeder');
+                    } else {
+                        throw new Error(`Error: ${response.statusText}`);
+                    }
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    showAlert('Error', data.error, 'error');
+                    return;
+                }
+                // Rellenamos los campos con los datos del feeder
+                document.getElementById('id-feeder').value = data.id_feeder || '';
+                document.getElementById('feeder').value = data.feeder || '';
+                document.getElementById('color-feeder').value = data.color_feeder || '';
+                document.getElementById('codigo-feeder').value = data.codigo_feeder || '';
+                document.getElementById('color-semana').value = data.color_semana || '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error', error.message, 'error');
+            });
     }
 </script>
 {% endblock %}

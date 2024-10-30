@@ -1,0 +1,5 @@
+2024-10-29 15:14:57 - Error en la función registro: 'NoneType' object has no attribute 'split'
+2024-10-29 15:15:03 - Error en la función registro: 'NoneType' object has no attribute 'split'
+2024-10-29 15:16:39 - Error en la función registro: 'NoneType' object has no attribute 'split'
+2024-10-29 15:16:55 - Error en la función registro: 'NoneType' object has no attribute 'split'
+2024-10-29 15:20:34 - Error en la función registro: 'NoneType' object has no attribute 'split'

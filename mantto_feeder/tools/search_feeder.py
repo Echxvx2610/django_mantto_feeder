@@ -28,7 +28,8 @@ pd.set_option('display.width', None)
 
 #***************************** Creacion de un dataframe ********************************
 #data = pd.read_csv(r'C:\Users\CECHEVARRIAMENDOZA\OneDrive - Brunswick Corporation\Documents\Proyectos_Python\PysimpleGUI\Proyectos\mantto_feeder\data\plan feeders SEM.csv',encoding='ISO-8859-1',usecols=['serie','feeder'])
-data = pd.read_csv(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\plan feeders SEM.csv',encoding='ISO-8859-1',usecols=['serie','feeder'],low_memory=False) #ruta oficial de documento
+#data = pd.read_csv(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\plan feeders SEM.csv',encoding='ISO-8859-1',usecols=['serie','feeder'],low_memory=False) #ruta oficial de documento
+data = pd.read_csv(r'mantto_feeder\data\plan_feeders_SEM.csv',encoding='ISO-8859-1',usecols=['serie','feeder'],low_memory=False)
 df = pd.DataFrame(data)
 
 #**************************** Renombrar columnas ********************************
@@ -37,24 +38,42 @@ df.rename(columns={'feeder':'Feeder'},inplace=True)
 
 #print(df)
 
-def search_id(ID_FEEDER):
-     '''
-     search_id(ID_FEEDER:int)
-         toma como parametro el id del feeder,mismo que sera proporcionado por la app feeder status
-         mediante el escaneo de los feeders.
-         retorna: un dataframe con todos los datos del feeder ( ID_feeder, Feeder )  
+# def search_id(ID_FEEDER):
+#      '''
+#      search_id(ID_FEEDER:int)
+#          toma como parametro el id del feeder,mismo que sera proporcionado por la app feeder status
+#          mediante el escaneo de los feeders.
+#          retorna: un dataframe con todos los datos del feeder ( ID_feeder, Feeder )  
        
-         extra:
-             -Index ID_feeder: index de ID_feeder(posicion del dato en csv)
-             -Index fecha: index de fecha (posicion del dato en csv)
-     '''
-     #buscar feeder por id
-     if ID_FEEDER in df['ID_feeder'].values:
-         #valores de index feeder y fecha "erroneos" solo para guiarse en CSV
-         resultado = df.loc[df['ID_feeder'] == ID_FEEDER].to_string(index = False)
-         id_feeder = resultado.split()
-         descripcion = id_feeder[3]
-         return resultado
+#          extra:
+#              -Index ID_feeder: index de ID_feeder(posicion del dato en csv)
+#              -Index fecha: index de fecha (posicion del dato en csv)
+#      '''
+#      #buscar feeder por id
+#      if ID_FEEDER in df['ID_feeder'].values:
+#          #valores de index feeder y fecha "erroneos" solo para guiarse en CSV
+#          resultado = df.loc[df['ID_feeder'] == ID_FEEDER].to_string(index = False)
+#          id_feeder = resultado.split()
+#          descripcion = id_feeder[3]
+#          return resultado
+#adapata a web
+def search_id(ID_FEEDER):
+    '''
+    search_id(ID_FEEDER: int)
+        Busca un feeder por ID en el DataFrame.
+        Retorna un diccionario con la descripción del feeder o None si no se encuentra.
+    '''
+    if ID_FEEDER in df['ID_feeder'].values:
+        resultado = df.loc[df['ID_feeder'] == ID_FEEDER].to_string(index=False)
+        id_feeder = resultado.split()
+        descripcion = id_feeder[3:6]  # Extraemos la descripción
+        # Convertimos la descripción en una cadena de texto
+        descripcion = ' '.join(descripcion)
+        return {
+            "id_feeder": ID_FEEDER,
+            "feeder": descripcion
+        }
+    return None  # Si no se encuentra el feeder, retornamos None 
   
      
 #index feeder y fecha
