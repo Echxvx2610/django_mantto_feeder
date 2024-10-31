@@ -33,7 +33,8 @@ def consultar(request):
                 'feeder': resultado['feeder'],
                 'color_feeder': color_feeder,
                 'codigo_feeder': codigo,
-                'color_semana': color_semana
+                'color_semana': color_semana,
+                'valor_celda': valor_celda
             }
             if not resultado:
                 return JsonResponse({"error": "Feeder no encontrado."}, status=404)

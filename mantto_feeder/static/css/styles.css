@@ -15,7 +15,6 @@
     padding: 20px;
 }
 
-
 .navbar {
     position: top;
     top: 0;
@@ -74,11 +73,11 @@ canvas {
 }
 
 /* Media query: Cambios en pantallas pequeñas */
-@media (max-width: 600px) {
+@media (max-width: 500px) {
     .container {
         width: 100%; /* Ocupa todo el ancho disponible */
         min-width: 100%; /* Evita espacios vacíos en móviles */
-        padding: 10px;
+        padding: 15px;
     }
 
     /* Secciones apiladas verticalmente */

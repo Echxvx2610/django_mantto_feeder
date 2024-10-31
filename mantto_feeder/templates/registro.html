@@ -4,12 +4,12 @@
 
 {% block content %}
 <div class="container my-4">
-    <form class="row gx-3 gy-2 align-items-center" method="GET" action="/consultar/">
+    <form id="formularioFeeder" class="row gx-3 gy-2 align-items-center" method="GET" action="/consultar/">
         <!-- ID Feeder para consultar datos-->
         <div class="col-md-6">
             <label for="data" class="form-label">Data</label>
-            <input type="text" class="form-control" id="data" name="feeder_id" placeholder="Buscar por ID"
-                maxlength="9">
+            <input type="text" class="form-control" id="data" name="feeder_id" placeholder="Buscar por ID" maxlength="9"
+                required>
         </div>
 
         <!-- Color de la Semana -->
@@ -92,11 +92,18 @@
                 <option value="OK">OK</option>
             </select>
         </div>
+        <!-- Boton de Calibrar y Reset  -->
+        <div class="col-6 text-center gap-2">
+            <button type="submit" class="btn btn-primary " id="calibrar-btn"
+                style="padding:10px 20px; margin: 5px; width: 90px;">Calibrar</button>
+            <button type="reset" class="btn btn-danger" id="reset-btn"
+                style="padding:10px 20px; margin: 5px; width: 90px;">Reset</button>
+        </div>
 
         <!-- Observaciones -->
         <div class="col-12">
             <label for="observaciones" class="form-label">Observaciones</label>
-            <textarea id="observaciones" rows="4" class="form-control"></textarea>
+            <textarea type="text" id="observaciones" rows="4" class="form-control"></textarea>
         </div>
 
         <!-- Footer -->
@@ -107,14 +114,14 @@
 </div>
 
 <script>
-    let debounceTimeout;  // Definir variable de debounce en el ámbito global del script
+    // Función para manejar el evento de teclado en data
+    let debounceTimeout;
 
-    // Manejo del evento Enter para buscar feeder info con debounce
     document.getElementById('data').addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
-            event.preventDefault();  // Evitar recarga de la página
-            clearTimeout(debounceTimeout);  // Limpiar cualquier timeout previo
-            debounceTimeout = setTimeout(fetchFeederInfo, 300);  // Esperar 300ms antes de ejecutar
+            event.preventDefault();
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(fetchFeederInfo, 300);
         }
     });
 
@@ -127,12 +134,13 @@
         });
     }
 
+    // Función para obtener los datos de un feeder comunicando con el backend
     function fetchFeederInfo() {
         const feederId = document.getElementById('data').value.trim();
 
         if (!feederId) {
             showAlert('Campo vacío', 'Por favor, introduce un ID de feeder', 'warning');
-            return;  // Evitar ejecución si el campo está vacío
+            return;
         }
 
         fetch(`/consultar/?feeder_id=${feederId}`, {
@@ -158,17 +166,177 @@
                     showAlert('Error', data.error, 'error');
                     return;
                 }
-                // Rellenamos los campos con los datos del feeder
+
                 document.getElementById('id-feeder').value = data.id_feeder || '';
                 document.getElementById('feeder').value = data.feeder || '';
                 document.getElementById('color-feeder').value = data.color_feeder || '';
                 document.getElementById('codigo-feeder').value = data.codigo_feeder || '';
                 document.getElementById('color-semana').value = data.color_semana || '';
+
+                // Cambiar color de la barra de estado según valor_celda
+                const statusCanvas = document.getElementById('status-canvas');
+                const ctx = statusCanvas.getContext('2d');
+
+                ctx.clearRect(0, 0, statusCanvas.width, statusCanvas.height);  // Limpiar el canvas
+
+                if (data.valor_celda === "OK") {
+                    ctx.fillStyle = 'lawngreen';
+                } else {
+                    ctx.fillStyle = 'crimson';
+                }
+
+                ctx.fillRect(0, 0, statusCanvas.width, statusCanvas.height);  // Dibujar la barra de estado
+
             })
             .catch(error => {
                 console.error('Error:', error);
                 showAlert('Error', error.message, 'error');
             });
     }
+
+    // Función para manejar el evento de cambio en los selects
+    function handleSelectChange(event) {
+        // Obtener todos los selects
+        const selects = document.querySelectorAll('.form-select');
+
+        // Verificar si el valor seleccionado es "OK"
+        if (event.target.value === "OK") {
+            // Si se selecciona "OK", deshabilitar los otros selects
+            selects.forEach(select => {
+                if (select !== event.target) {
+                    select.disabled = true;
+                }
+            });
+        } else {
+            // Si se selecciona "NG" en el select actual, habilitar todos los selects
+            selects.forEach(select => {
+                select.disabled = false;
+            });
+        }
+    }
+
+    // Agregar el evento de cambio a todos los selects
+    document.querySelectorAll('.form-select').forEach(select => {
+        select.addEventListener('change', handleSelectChange);
+    });
+
+    function recolectarDatosFormulario(event) {
+        event.preventDefault();  // Evita que el formulario se envíe automáticamente
+        const formulario = document.getElementById('formularioFeeder');
+
+        if (!formulario) {
+            console.error("Formulario no encontrado. Verifica que el ID sea correcto.");
+            return;
+        }
+
+        const datosFormulario = {};
+        let todosNG = true;  // Verificación si todos los selects están en "NG"
+        let camposVacios = [];  // Para almacenar campos vacíos
+
+        Array.from(formulario.elements).forEach(element => {
+            if (element.id && (element.type === 'text' || element.type === 'select-one' || element.tagName === 'TEXTAREA')) {
+                datosFormulario[element.id] = element.value;
+
+                // Verificar si algún select tiene el valor "OK"
+                if (element.type === 'select-one' && element.value === 'OK') {
+                    todosNG = false;
+                }
+
+                // Verificar si algún campo está vacío, excepto 'tecnico' y 'observaciones'
+                if (element.value.trim() === '' && element.id !== 'tecnico') {
+                    camposVacios.push(element.id);  // Agrega el ID del campo vacío
+                }
+            }
+        });
+
+        // Verificar que no haya campos vacíos y que "data" tenga un valor
+        if (camposVacios.length > 0 || !datosFormulario['data'] || datosFormulario['data'].trim() === '') {
+            let mensajeError = 'Por favor, completa todos los campos obligatorios.';
+            if (camposVacios.length > 0) {
+                mensajeError += `\nCampos faltantes: ${camposVacios.join(', ')}`;
+            }
+            Swal.fire({
+                title: 'Error',
+                text: mensajeError,
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
+            return;  // Salir de la función si hay campos vacíos
+        }
+
+        // Verificar que al menos un select esté en "OK"
+        if (todosNG) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Al menos uno de los selects debe estar en "OK".',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
+            return;  // Salir de la función si todos los selects están en "NG"
+        }
+
+        // Solicitar número de técnico si está vacío
+        if (!datosFormulario['tecnico'] || datosFormulario['tecnico'].trim() === '') {
+            Swal.fire({
+                title: 'Ingrese su número de técnico',
+                input: 'text',
+                inputPlaceholder: 'Número de técnico',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return '¡Por favor ingrese el número de técnico!';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    datosFormulario['tecnico'] = result.value;  // Asignar el valor ingresado
+                    console.log(datosFormulario);  // Aquí puedes procesar los datos finales
+                }
+            });
+        } else {
+            console.log(datosFormulario);  // Procesar los datos directamente si 'tecnico' ya está lleno
+        }
+    }
+
+    // Agregar evento al botón Calibrar
+    document.getElementById('calibrar-btn').addEventListener('click', recolectarDatosFormulario);
+
+    // Agregar evento al botón Reset
+    document.getElementById('reset-btn').addEventListener('click', function (event) {
+        event.preventDefault();  // Evita el comportamiento de reinicio por defecto
+
+        const formulario = document.getElementById('formularioFeeder');
+
+        if (!formulario) {
+            console.error("Formulario no encontrado. Verifica que el ID sea correcto.");
+            return;
+        }
+
+        // Limpiar campos de texto y selects
+        Array.from(formulario.elements).forEach(element => {
+            if (element.type === 'text') {
+                element.value = '';  // Limpiar los campos de texto
+            } else if (element.type === 'select-one') {
+                element.value = 'NG';  // Restablecer selects a "NG"
+                element.disabled = false;  // Habilitar los selects nuevamente
+            }
+        });
+
+        // Restablecer el color del canvas de status
+        const canvasStatus = document.getElementById('status-canvas');
+        if (canvasStatus) {
+            const ctx = canvasStatus.getContext('2d');
+            ctx.clearRect(0, 0, canvasStatus.width, canvasStatus.height);  // Limpia el canvas
+        }
+
+        // Mensaje opcional de confirmación de reseteo usando SweetAlert
+        Swal.fire({
+            title: 'Formulario reiniciado',
+            text: 'Todos los campos se han restablecido.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar',
+        });
+    });
+
 </script>
 {% endblock %}
