@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse,JsonResponse
-
-from .tools import search_feeder
+import json
+from .tools import crear_plantilla,search_feeder,progress,loggin,validar
 from datetime import datetime
 
 
@@ -49,13 +49,30 @@ def consultar(request):
     return render(request, 'registro.html')
 
 def registro(request):
-    return HttpResponse("registro de prueba")
+    # remplaza get_data() --> con json de registro
+    if request.method == 'POST':
+        try:
+            # Cargar los datos JSON del cuerpo de la solicitud
+            data = json.loads(request.body)
+            print(data)  # Para verificar que los datos están llegando
+            # Procesamiento de los datos
+            feeder_value = data.get('id-feeder')
+            print(int(feeder_value))  # Para verificar el tipo de dato de la variable feeder_value)
+           
+           
+            return JsonResponse({'success': True, 'message': 'Datos procesados correctamente.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Error al procesar los datos.'}, status=400)
+
+    # Para las solicitudes GET, puedes verificar si se accede a la vista correcta
+    print("GET request to registro view")
+    return render(request, 'registro.html')
+
 def home(request):
     return render(request, 'home.html')
 
 def analisis(request):
     return render(request, 'analisis.html')
-
 
 def reparaciones(request):
     return render(request, 'reparaciones.html')

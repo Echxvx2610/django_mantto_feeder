@@ -82,7 +82,7 @@ def index_ff(ID_FEEDER):
     valor_feeder = ID_FEEDER
     indice_feeder = int(df['ID_feeder'].index[df['ID_feeder']==valor_feeder][0]) + 2
   
-    with open(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\plan feeders SEM.csv', 'r') as plan_semanal: #ruta oficial de documento
+    with open(r'mantto_feeder\data\plan_feeders_SEM.csv', 'r') as plan_semanal: #ruta oficial de documento
         # Crea un lector CSV
         lector_csv = csv.reader(plan_semanal)
         # Obtiene la primera fila del archivo CSV
@@ -104,7 +104,7 @@ def cell_value(ID_FEEDER:int):
     '''
     #cargar archivo excel
     # Abre el archivo CSV en modo lectura
-    with open(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\plan feeders SEM.csv','r') as plan_semanal:#ruta oficial de documento
+    with open(r'mantto_feeder\data\plan_feeders_SEM.csv','r') as plan_semanal:#ruta oficial de documento
         # Crea un lector CSV
         lector_csv = csv.reader(plan_semanal)
         # Obtiene la primera fila del archivo CSV
@@ -195,7 +195,9 @@ def rellenar_rango_hasta_P(fila, columna_inicio):
     '''
     try:
         # Abrir el archivo CSV en modo lectura
-        with open(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\plan feeders SEM.csv', 'r') as archivo_csv:
+        with open(r'mantto_feeder\data\plan_feeders_SEM.csv', 'r') as archivo_csv:
+            # H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\plan feeders SEM.csv
+            # C:\Users\CECHEVARRIAMENDOZA\OneDrive - Brunswick Corporation\Documents\Proyectos_Python\Django\mantto_feeder\mantto_feeder\data\plan_feeders_SEM.csv
             # Leer el archivo CSV
             filas = list(csv.reader(archivo_csv))
 
@@ -226,7 +228,7 @@ def rellenar_rango_hasta_P(fila, columna_inicio):
 
         # Guardar los cambios en el archivo CSV
         try:
-            with open(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\plan feeders SEM.csv', 'w', newline='') as archivo_csv:
+            with open(r'mantto_feeder\data\plan_feeders_SEM.csv', 'w', newline='') as archivo_csv:
                 escritor = csv.writer(archivo_csv)
                 escritor.writerows(filas)
         except IOError:

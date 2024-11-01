@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="container my-4">
+    {% csrf_token %}
     <form id="formularioFeeder" class="row gx-3 gy-2 align-items-center" method="GET" action="/consultar/">
         <!-- ID Feeder para consultar datos-->
         <div class="col-md-6">
@@ -114,6 +115,24 @@
 </div>
 
 <script>
+    // Función para obtener el valor de una cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Comprueba si esta cookie empieza con el nombre que buscamos
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+
     // Función para manejar el evento de teclado en data
     let debounceTimeout;
 
@@ -220,6 +239,7 @@
         select.addEventListener('change', handleSelectChange);
     });
 
+
     function recolectarDatosFormulario(event) {
         event.preventDefault();  // Evita que el formulario se envíe automáticamente
         const formulario = document.getElementById('formularioFeeder');
@@ -230,26 +250,21 @@
         }
 
         const datosFormulario = {};
-        let todosNG = true;  // Verificación si todos los selects están en "NG"
-        let camposVacios = [];  // Para almacenar campos vacíos
+        let todosNG = true;
+        let camposVacios = [];
 
         Array.from(formulario.elements).forEach(element => {
             if (element.id && (element.type === 'text' || element.type === 'select-one' || element.tagName === 'TEXTAREA')) {
                 datosFormulario[element.id] = element.value;
-
-                // Verificar si algún select tiene el valor "OK"
                 if (element.type === 'select-one' && element.value === 'OK') {
                     todosNG = false;
                 }
-
-                // Verificar si algún campo está vacío, excepto 'tecnico' y 'observaciones'
                 if (element.value.trim() === '' && element.id !== 'tecnico') {
-                    camposVacios.push(element.id);  // Agrega el ID del campo vacío
+                    camposVacios.push(element.id);
                 }
             }
         });
 
-        // Verificar que no haya campos vacíos y que "data" tenga un valor
         if (camposVacios.length > 0 || !datosFormulario['data'] || datosFormulario['data'].trim() === '') {
             let mensajeError = 'Por favor, completa todos los campos obligatorios.';
             if (camposVacios.length > 0) {
@@ -261,10 +276,9 @@
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
             });
-            return;  // Salir de la función si hay campos vacíos
+            return;
         }
 
-        // Verificar que al menos un select esté en "OK"
         if (todosNG) {
             Swal.fire({
                 title: 'Error',
@@ -272,30 +286,74 @@
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
             });
-            return;  // Salir de la función si todos los selects están en "NG"
+            return;
         }
 
-        // Solicitar número de técnico si está vacío
+        const tecnicoInput = document.getElementById('tecnico');
+
         if (!datosFormulario['tecnico'] || datosFormulario['tecnico'].trim() === '') {
+            // Habilitamos el campo técnico para que el usuario lo complete
+            tecnicoInput.disabled = false;
             Swal.fire({
-                title: 'Ingrese su número de técnico',
+                title: 'Ingrese su número de empleado',
                 input: 'text',
-                inputPlaceholder: 'Número de técnico',
                 showCancelButton: true,
                 inputValidator: (value) => {
                     if (!value) {
-                        return '¡Por favor ingrese el número de técnico!';
-                    }
+                        return '¡Por favor ingrese el número de empleado!';
+                    } 
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    datosFormulario['tecnico'] = result.value;  // Asignar el valor ingresado
-                    console.log(datosFormulario);  // Aquí puedes procesar los datos finales
+                    // Asignamos el valor al campo técnico
+                    tecnicoInput.value = result.value;
+                    tecnicoInput.disabled = true; // Deshabilitamos de nuevo el campo
+
+                    datosFormulario['tecnico'] = result.value; // Guardamos el valor en el objeto
+                    enviarDatos(datosFormulario);
                 }
             });
         } else {
-            console.log(datosFormulario);  // Procesar los datos directamente si 'tecnico' ya está lleno
+            enviarDatos(datosFormulario);
         }
+    }
+
+    function enviarDatos(datosFormulario) {
+        fetch('/registro/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),  // Obtener el token CSRF
+            },
+            body: JSON.stringify(datosFormulario),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Éxito',
+                        text: 'Los datos han sido procesados correctamente.',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar',
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar',
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error en la solicitud:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Ocurrió un error al procesar los datos.',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar',
+                });
+            });
     }
 
     // Agregar evento al botón Calibrar
@@ -337,6 +395,5 @@
             confirmButtonText: 'Aceptar',
         });
     });
-
 </script>
 {% endblock %}
