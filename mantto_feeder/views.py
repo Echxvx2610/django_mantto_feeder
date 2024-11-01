@@ -57,9 +57,20 @@ def registro(request):
             print(data)  # Para verificar que los datos están llegando
             # Procesamiento de los datos
             feeder_value = data.get('id-feeder')
-            print(int(feeder_value))  # Para verificar el tipo de dato de la variable feeder_value)
-           
-           
+            try:    
+                search_feeder.rellenar_rango_hasta_P(
+                    search_feeder.index_ff(int(data.get('id-feeder')))[0],
+                    search_feeder.index_ff(int(data.get('id-feeder')))[1]
+                )
+            except IOError as e:
+                return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
+            try:
+                print("se valido funcion index_ff y rellenar_rango_hasta_P")
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
+            
             return JsonResponse({'success': True, 'message': 'Datos procesados correctamente.'})
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'message': 'Error al procesar los datos.'}, status=400)
