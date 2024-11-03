@@ -195,7 +195,10 @@
                 // Cambiar color de la barra de estado según valor_celda
                 const statusCanvas = document.getElementById('status-canvas');
                 const ctx = statusCanvas.getContext('2d');
+                const calibracionCanvas = document.getElementById('calibracion-canvas');
+                const ctx2 = calibracionCanvas.getContext('2d');
 
+                ctx2.clearRect(0, 0, calibracionCanvas.width, calibracionCanvas.height);
                 ctx.clearRect(0, 0, statusCanvas.width, statusCanvas.height);  // Limpiar el canvas
 
                 if (data.valor_celda === "OK") {
@@ -336,8 +339,19 @@
                         icon: 'success',
                         confirmButtonText: 'Aceptar',
                     }).then(() => {
-                        // Aquí puedes resetear el formulario si lo deseas
+                        // Cambiar el color del canvas a lawngreen
+                        const canvas = document.getElementById('calibracion-canvas');
+                        const ctx = canvas.getContext('2d');
+                        // Llenar el canvas con el color lawngreen
+                        ctx.fillStyle = 'lawngreen';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height); // Rellenar el rectángulo del canvas
+                        
+                        // Reiniciar el formulario
                         document.getElementById('formularioFeeder').reset();
+                        const statusCanvas = document.getElementById('status-canvas');
+                        const ctx2 = statusCanvas.getContext('2d');
+                        // quitar el color del canvas
+                        ctx2.clearRect(0, 0, statusCanvas.width, statusCanvas.height);
                     });
                 } else {
                     Swal.fire({
@@ -396,6 +410,11 @@
         if (canvasStatus) {
             const ctx = canvasStatus.getContext('2d');
             ctx.clearRect(0, 0, canvasStatus.width, canvasStatus.height);  // Limpia el canvas
+        }
+        const canvasCalibracion = document.getElementById('calibracion-canvas');
+        if (canvasCalibracion) {
+            const ctx = canvasCalibracion.getContext('2d');
+            ctx.clearRect(0, 0, canvasCalibracion.width, canvasCalibracion.height);  // Limpia el canvas
         }
 
         // Mensaje opcional de confirmación de reseteo usando SweetAlert
