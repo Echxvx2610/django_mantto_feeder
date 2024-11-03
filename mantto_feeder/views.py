@@ -49,35 +49,59 @@ def consultar(request):
     return render(request, 'registro.html')
 
 def registro(request):
-    # remplaza get_data() --> con json de registro
     if request.method == 'POST':
         try:
             # Cargar los datos JSON del cuerpo de la solicitud
             data = json.loads(request.body)
-            print(data)  # Para verificar que los datos están llegando
-            # Procesamiento de los datos
-            feeder_value = data.get('id-feeder')
-            try:    
-                search_feeder.rellenar_rango_hasta_P(
-                    search_feeder.index_ff(int(data.get('id-feeder')))[0],
-                    search_feeder.index_ff(int(data.get('id-feeder')))[1]
-                )
-            except IOError as e:
-                return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
-            except Exception as e:
-                return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
+            feeder_id = int(data.get('id-feeder'))
+
+            # fecha para plantilla
+            fecha_actual = datetime.now()
+            dia = fecha_actual.day
+            mes = fecha_actual.strftime('%b')
+            año = fecha_actual.year
+            fecha_mantenimiento = "{}{}{}".format(dia,mes,año)
+            tipo_feeder = ""
+            # tipo de feeder sera igual a la key con valor OK
+            for key, value in data.items():
+                if value == "OK":
+                    tipo_feeder = key
+            # Procesar los datos del feeder
             try:
-                print("se valido funcion index_ff y rellenar_rango_hasta_P")
-            except Exception as e:
+                index = search_feeder.index_ff(feeder_id)
+                search_feeder.rellenar_rango_hasta_P(index[0], index[1])
+                #print("Validado función index_ff y rellenar_rango_hasta_P")
+            except (IOError, Exception) as e:
+                return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
+            
+            # Antes de generar el reporte, validar el número de técnico
+            try:
+                tecnico_valido = validar.user(data.get('tecnico'))
+                
+                if tecnico_valido is None:
+                    return JsonResponse({'success': False, 'message': 'El No.Empleado no es válido.'}, status=400)
+
+                print("Validado función validar_tecnico")
+            except (IOError, Exception) as e:
+                return JsonResponse({'success': False, 'message': f'Error al validar el No.Empleado: {e}'}, status=400)
+
+            # Procesar los datos para generar la plantilla (reporte)
+            try:
+                crear_plantilla.create_template(tecnico_valido, feeder_id, tipo_feeder, fecha_mantenimiento, data.get('color-semana'), data.get('observaciones'))
+            except (IOError, Exception) as e:
                 return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
             
             return JsonResponse({'success': True, 'message': 'Datos procesados correctamente.'})
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'message': 'Error al procesar los datos.'}, status=400)
 
-    # Para las solicitudes GET, puedes verificar si se accede a la vista correcta
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Error al procesar los datos: JSON inválido.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': f'Error inesperado: {e}'}, status=500)
+
+    # Manejo de solicitudes GET
     print("GET request to registro view")
     return render(request, 'registro.html')
+
 
 def home(request):
     return render(request, 'home.html')

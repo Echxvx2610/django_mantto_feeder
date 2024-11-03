@@ -58,7 +58,7 @@ def create_template(Nombre_Tecnico, ID_Feeder, Tipo_Feeder, Fecha_Mantenimiento,
     hoja.merge_cells("C4:E5")
     
     #********************************* Imagen ***********************
-    img = Image('mantto_feeder\img\LOGO_NAVICO_1_90-black.png')
+    img = Image('mantto_feeder\static\img\LOGO_NAVICO_1_90-black.png')
     #hoja.add_image(img, "C4")
 
     

@@ -17,5 +17,7 @@ def user(id_tech:str):
         for item in busqueda_s:
             resultado += item + " "
         return resultado
+    else:
+        return None
 
-#print(user("015310A"))
+# print(user("015310A"))

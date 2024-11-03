@@ -60,8 +60,8 @@
 
         <!-- CP -->
         <div class="col-md-6">
-            <label for="cp" class="form-label">CP</label>
-            <select id="cp" class="form-select">
+            <label for="CP" class="form-label">CP</label>
+            <select id="CP" class="form-select">
                 <option value="NG">NG</option>
                 <option value="OK">OK</option>
             </select>
@@ -69,8 +69,8 @@
 
         <!-- QP -->
         <div class="col-md-6">
-            <label for="qp" class="form-label">QP</label>
-            <select id="qp" class="form-select">
+            <label for="QP" class="form-label">QP</label>
+            <select id="QP" class="form-select">
                 <option value="NG">NG</option>
                 <option value="OK">OK</option>
             </select>
@@ -78,8 +78,8 @@
 
         <!-- Hover -->
         <div class="col-md-6">
-            <label for="hover" class="form-label">Hover</label>
-            <select id="hover" class="form-select">
+            <label for="HOVER" class="form-label">Hover</label>
+            <select id="HOVER" class="form-select">
                 <option value="NG">NG</option>
                 <option value="OK">OK</option>
             </select>
@@ -87,8 +87,8 @@
 
         <!-- BFC -->
         <div class="col-md-6">
-            <label for="bfc" class="form-label">BFC</label>
-            <select id="bfc" class="form-select">
+            <label for="BFC" class="form-label">BFC</label>
+            <select id="BFC" class="form-select">
                 <option value="NG">NG</option>
                 <option value="OK">OK</option>
             </select>
@@ -301,7 +301,7 @@
                 inputValidator: (value) => {
                     if (!value) {
                         return '¡Por favor ingrese el número de empleado!';
-                    } 
+                    }
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -332,9 +332,12 @@
                 if (data.success) {
                     Swal.fire({
                         title: 'Éxito',
-                        text: 'Los datos han sido procesados correctamente.',
+                        text: 'Reporte generado exitosamente',
                         icon: 'success',
                         confirmButtonText: 'Aceptar',
+                    }).then(() => {
+                        // Aquí puedes resetear el formulario si lo deseas
+                        document.getElementById('formularioFeeder').reset();
                     });
                 } else {
                     Swal.fire({
@@ -342,6 +345,11 @@
                         text: data.message,
                         icon: 'error',
                         confirmButtonText: 'Aceptar',
+                    }).then(() => {
+                        // Reiniciar el campo técnico si es necesario
+                        const tecnicoInput = document.getElementById('tecnico');
+                        tecnicoInput.disabled = false;  // Habilitar para que el usuario lo intente de nuevo
+                        tecnicoInput.value = '';  // Limpiar el valor
                     });
                 }
             })
@@ -355,6 +363,7 @@
                 });
             });
     }
+
 
     // Agregar evento al botón Calibrar
     document.getElementById('calibrar-btn').addEventListener('click', recolectarDatosFormulario);
@@ -377,6 +386,8 @@
             } else if (element.type === 'select-one') {
                 element.value = 'NG';  // Restablecer selects a "NG"
                 element.disabled = false;  // Habilitar los selects nuevamente
+            } else if (element.tagName === 'TEXTAREA') {
+                element.value = '';
             }
         });
 
