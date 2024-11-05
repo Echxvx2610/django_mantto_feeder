@@ -1,0 +1,7 @@
+1-Cantidad de feeders programado por semana ponernos una meta [goal y que se vea en el grafico] .
+
+2-Cantidad de feeders realizados para cada feeder repair diario,semanal, mensual  [grafico].
+
+3-Tiempo que tardan en hacer un feeder [escanear feeder cuando inician el mantto y escanearlo al terminarlo].
+
+3-Comparativo cuanto tardan el mantto de un feeder por técnico despues de aplicar el punto numero 4.

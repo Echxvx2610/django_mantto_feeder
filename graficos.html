@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos de Barras con Meta</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Highcharts -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .chart-container {
+            margin-bottom: 40px;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gráficos de Barras con Meta</h1>
+
+    <div class="chart-container">
+        <h2>Chart.js</h2>
+        <canvas id="chartjs-chart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <h2>ApexCharts</h2>
+        <div id="apexcharts-chart"></div>
+    </div>
+
+    <div class="chart-container">
+        <h2>Highcharts</h2>
+        <div id="highcharts-chart"></div>
+    </div>
+
+    <div class="chart-container">
+        <h2>D3.js</h2>
+        <div id="d3-chart"></div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        const data = [
+            { mes: 'Enero', ventas: 12000 },
+            { mes: 'Febrero', ventas: 19000 },
+            { mes: 'Marzo', ventas: 15000 },
+            { mes: 'Abril', ventas: 25000 },
+            { mes: 'Mayo', ventas: 22000 },
+            { mes: 'Junio', ventas: 30000 },
+        ];
+        const meta = 20000;
+
+        // Función para formatear moneda
+        const formatCurrency = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format;
+
+        // Chart.js
+        const ctx = document.getElementById('chartjs-chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.mes),
+                datasets: [{
+                    label: 'Ventas',
+                    data: data.map(d => d.ventas),
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Ventas (EUR)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return formatCurrency(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Ventas Mensuales vs Meta'
+                    }
+                }
+            },
+            plugins: [{
+                afterDraw: chart => {
+                    const ctx = chart.ctx;
+                    const yAxis = chart.scales.y;
+                    const xAxis = chart.scales.x;
+                    const goalY = yAxis.getPixelForValue(meta);
+                    
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(xAxis.left, goalY);
+                    ctx.lineTo(xAxis.right, goalY);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+                    ctx.stroke();
+                    
+                    ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+                    ctx.textAlign = 'right';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText('Meta: ' + formatCurrency(meta), xAxis.right, goalY - 5);
+                    ctx.restore();
+                }
+            }]
+        });
+
+        // ApexCharts
+        new ApexCharts(document.getElementById('apexcharts-chart'), {
+            series: [{
+                name: 'Ventas',
+                data: data.map(d => d.ventas)
+            }],
+            chart: {
+                type: 'bar',
+                height: 350
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    endingShape: 'rounded'
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            xaxis: {
+                categories: data.map(d => d.mes),
+            },
+            yaxis: {
+                title: {
+                    text: 'Ventas (EUR)'
+                },
+                labels: {
+                    formatter: function (value) {
+                        return formatCurrency(value);
+                    }
+                }
+            },
+            fill: {
+                opacity: 0.8
+            },
+            tooltip: {
+                y: {
+                    formatter: function (value) {
+                        return formatCurrency(value);
+                    }
+                }
+            },
+            title: {
+                text: 'Ventas Mensuales vs Meta',
+                align: 'center'
+            },
+            annotations: {
+                yaxis: [{
+                    y: meta,
+                    borderColor: '#FF0000',
+                    label: {
+                        borderColor: '#FF0000',
+                        style: {
+                            color: '#fff',
+                            background: '#FF0000'
+                        },
+                        text: 'Meta: ' + formatCurrency(meta)
+                    }
+                }]
+            }
+        }).render();
+
+        // Highcharts
+        Highcharts.chart('highcharts-chart', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Ventas Mensuales vs Meta'
+            },
+            xAxis: {
+                categories: data.map(d => d.mes)
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Ventas (EUR)'
+                },
+                labels: {
+                    formatter: function () {
+                        return formatCurrency(this.value);
+                    }
+                },
+                plotLines: [{
+                    color: 'red',
+                    width: 2,
+                    value: meta,
+                    label: {
+                        text: 'Meta: ' + formatCurrency(meta),
+                        align: 'right',
+                        style: {
+                            color: 'red'
+                        }
+                    },
+                    zIndex: 5
+                }]
+            },
+            series: [{
+                name: 'Ventas',
+                data: data.map(d => d.ventas)
+            }],
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.x + '</b><br/>' +
+                        this.series.name + ': ' + formatCurrency(this.y);
+                }
+            }
+        });
+
+        // D3.js
+        const margin = {top: 30, right: 30, bottom: 70, left: 80};
+        const width = 600 - margin.left - margin.right;
+        const height = 400 - margin.top - margin.bottom;
+
+        const svg = d3.select("#d3-chart")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const x = d3.scaleBand()
+            .range([0, width])
+            .domain(data.map(d => d.mes))
+            .padding(0.2);
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x));
+
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.ventas) * 1.1])
+            .range([height, 0]);
+        svg.append("g")
+            .call(d3.axisLeft(y).tickFormat(d => formatCurrency(d)));
+
+        svg.selectAll("mybar")
+            .data(data)
+            .enter()
+            .append("rect")
+                .attr("x", d => x(d.mes))
+                .attr("y", d => y(d.ventas))
+                .attr("width", x.bandwidth())
+                .attr("height", d => height - y(d.ventas))
+                .attr("fill", "#69b3a2");
+
+        svg.append("line")
+            .attr("x1", 0)
+            .attr("x2", width)
+            .attr("y1", y(meta))
+            .attr("y2", y(meta))
+            .attr("stroke", "red")
+            .attr("stroke-width", 2)
+            .attr("stroke-dasharray", "5,5");
+
+        svg.append("text")
+            .attr("x", width)
+            .attr("y", y(meta) - 5)
+            .attr("text-anchor", "end")
+            .attr("fill", "red")
+            .text("Meta: " + formatCurrency(meta));
+
+        svg.append("text")
+            .attr("x", width / 2)
+            .attr("y", 0 - (margin.top / 2))
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .text("Ventas Mensuales vs Meta");
+
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 0 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Ventas (EUR)");
+    </script>
+</body>
+</html>

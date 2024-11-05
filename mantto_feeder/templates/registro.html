@@ -3,8 +3,9 @@
 {% block title %}Registro{% endblock %}
 
 {% block content %}
-<div class="container my-4">
+<div class="my-5 registro">
     {% csrf_token %}
+    <h1 class="centrar titulo_principal">Registro de Feeder</h1>
     <form id="formularioFeeder" class="row gx-3 gy-2 align-items-center" method="GET" action="/consultar/">
         <!-- ID Feeder para consultar datos-->
         <div class="col-md-6">
@@ -94,11 +95,11 @@
             </select>
         </div>
         <!-- Boton de Calibrar y Reset  -->
-        <div class="col-6 text-center gap-2">
-            <button type="submit" class="btn btn-primary " id="calibrar-btn"
-                style="padding:10px 20px; margin: 5px; width: 90px;">Calibrar</button>
+        <div class="col-6 text-center gap-2 botones">
+            <button type="submit" class="btn btn-primary" id="calibrar-btn"
+                style="padding:10px; margin: 0 20px; width: 130px;">Calibrar</button>
             <button type="reset" class="btn btn-danger" id="reset-btn"
-                style="padding:10px 20px; margin: 5px; width: 90px;">Reset</button>
+                style="padding:10px; margin:0 20px; width: 130px;">Reset</button>
         </div>
 
         <!-- Observaciones -->
