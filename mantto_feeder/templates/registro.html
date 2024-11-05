@@ -94,6 +94,13 @@
                 <option value="OK">OK</option>
             </select>
         </div>
+
+        <!-- Tiempo de Captura -->
+        <div class="col-6">
+            <label for="time">Tiempo de Captura</label>
+            <input type="text" id="time" value="00:00:00" class="form-control" disabled />
+        </div>
+
         <!-- Boton de Calibrar y Reset  -->
         <div class="col-6 text-center gap-2 botones">
             <button type="submit" class="btn btn-primary" id="calibrar-btn"
@@ -133,6 +140,44 @@
         return cookieValue;
     }
 
+    let elapsedTime = 0;  // Variable para almacenar el tiempo transcurrido en segundos
+    let timerInterval;    // Intervalo para el cronómetro
+    let isTimerRunning = false;  // Indicador de si el cronómetro está corriendo
+
+    // Función para empezar el cronómetro
+    function startTimer() {
+        if (isTimerRunning) return;  // Si el cronómetro ya está corriendo, no hacer nada
+
+        // Reiniciar el tiempo antes de empezar
+        elapsedTime = 0;  // Reiniciamos el contador a cero
+        document.getElementById('time').value = "00:00:00";  // Reiniciar el campo de tiempo visual
+
+        isTimerRunning = true;
+        timerInterval = setInterval(() => {
+            elapsedTime++;  // Aumentar el tiempo en 1 segundo
+            const horas = Math.floor(elapsedTime / 3600);
+            const minutos = Math.floor((elapsedTime % 3600) / 60);
+            const segundos = elapsedTime % 60;
+
+            // Mostrar el tiempo en el campo "Tiempo de Captura"
+            const timeFormatted = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+            document.getElementById('time').value = timeFormatted;  // Actualizar el campo de tiempo
+        }, 1000);  // Actualizar cada segundo
+    }
+
+    // Función para detener el cronómetro y devolver el tiempo total
+    function stopTimer() {
+        if (isTimerRunning) {
+            clearInterval(timerInterval);  // Detener el intervalo
+            isTimerRunning = false;
+        }
+        return elapsedTime;  // Devolver el tiempo total acumulado
+    }
+
+    // Función para agregar ceros a la izquierda
+    function pad(number) {
+        return number < 10 ? '0' + number : number;
+    }
 
     // Función para manejar el evento de teclado en data
     let debounceTimeout;
@@ -210,6 +255,8 @@
 
                 ctx.fillRect(0, 0, statusCanvas.width, statusCanvas.height);  // Dibujar la barra de estado
 
+                // Iniciar el cronómetro
+                startTimer();  // Función que arranca el cronómetro
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -269,6 +316,9 @@
             }
         });
 
+        // Incluir el tiempo de captura (en segundos) en el objeto de datos
+        datosFormulario['tiempo_captura'] = elapsedTime; // El tiempo transcurrido en segundos
+
         if (camposVacios.length > 0 || !datosFormulario['data'] || datosFormulario['data'].trim() === '') {
             let mensajeError = 'Por favor, completa todos los campos obligatorios.';
             if (camposVacios.length > 0) {
@@ -286,7 +336,7 @@
         if (todosNG) {
             Swal.fire({
                 title: 'Error',
-                text: 'Al menos uno de los selects debe estar en "OK".',
+                text: 'Al menos un tipo de feeder debe ser "OK".',
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
             });
@@ -306,6 +356,9 @@
                     if (!value) {
                         return '¡Por favor ingrese el número de empleado!';
                     }
+                    if (value.length > 7) {
+                        return 'El número de empleado no puede tener más de 7 dígitos.';
+                    }
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -319,9 +372,11 @@
             });
         } else {
             enviarDatos(datosFormulario);
+            // imprimimos en la consola el objeto de datos
+            console.log(datosFormulario);
         }
     }
-
+    // Función que se ejecuta cuando se envían los datos
     function enviarDatos(datosFormulario) {
         fetch('/registro/', {
             method: 'POST',
@@ -340,18 +395,35 @@
                         icon: 'success',
                         confirmButtonText: 'Aceptar',
                     }).then(() => {
+                        // Detener el cronómetro y obtener el tiempo total
+                        const tiempoCaptura = stopTimer();  // Detener el cronómetro y obtener el tiempo
+
+                        // Convertir el tiempo de captura a formato HH:mm:ss
+                        const horas = Math.floor(tiempoCaptura / 3600);
+                        const minutos = Math.floor((tiempoCaptura % 3600) / 60);
+                        const segundos = tiempoCaptura % 60;
+
+                        // Formatear el tiempo en formato HH:mm:ss
+                        const tiempoFormateado = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+
+                        // Mostrar el tiempo total de captura en una nueva alerta
+                        Swal.fire({
+                            title: 'Tiempo Total de Captura',
+                            text: `El tiempo total de captura fue: ${tiempoFormateado}`,
+                            icon: 'info',
+                            confirmButtonText: 'Aceptar',
+                        });
+
                         // Cambiar el color del canvas a lawngreen
                         const canvas = document.getElementById('calibracion-canvas');
                         const ctx = canvas.getContext('2d');
-                        // Llenar el canvas con el color lawngreen
                         ctx.fillStyle = 'lawngreen';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height); // Rellenar el rectángulo del canvas
-                        
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);  // Rellenar el rectángulo del canvas
+
                         // Reiniciar el formulario
                         document.getElementById('formularioFeeder').reset();
                         const statusCanvas = document.getElementById('status-canvas');
                         const ctx2 = statusCanvas.getContext('2d');
-                        // quitar el color del canvas
                         ctx2.clearRect(0, 0, statusCanvas.width, statusCanvas.height);
                     });
                 } else {
@@ -361,7 +433,6 @@
                         icon: 'error',
                         confirmButtonText: 'Aceptar',
                     }).then(() => {
-                        // Reiniciar el campo técnico si es necesario
                         const tecnicoInput = document.getElementById('tecnico');
                         tecnicoInput.disabled = false;  // Habilitar para que el usuario lo intente de nuevo
                         tecnicoInput.value = '';  // Limpiar el valor
@@ -378,7 +449,6 @@
                 });
             });
     }
-
 
     // Agregar evento al botón Calibrar
     document.getElementById('calibrar-btn').addEventListener('click', recolectarDatosFormulario);
@@ -412,19 +482,27 @@
             const ctx = canvasStatus.getContext('2d');
             ctx.clearRect(0, 0, canvasStatus.width, canvasStatus.height);  // Limpia el canvas
         }
+
+        // Limpiar el canvas de calibración
         const canvasCalibracion = document.getElementById('calibracion-canvas');
         if (canvasCalibracion) {
             const ctx = canvasCalibracion.getContext('2d');
             ctx.clearRect(0, 0, canvasCalibracion.width, canvasCalibracion.height);  // Limpia el canvas
         }
 
+        // Detener el cronómetro y restablecer el tiempo
+        stopTimer();  // Detener el cronómetro
+        elapsedTime = 0;  // Restablecer el tiempo acumulado a 0
+        document.getElementById('time').value = "00:00:00";  // Resetear el campo de tiempo en la interfaz
+
         // Mensaje opcional de confirmación de reseteo usando SweetAlert
         Swal.fire({
             title: 'Formulario reiniciado',
-            text: 'Todos los campos se han restablecido.',
+            text: 'Todos los campos se han restablecido y el cronómetro ha sido detenido.',
             icon: 'success',
             confirmButtonText: 'Aceptar',
         });
     });
+
 </script>
 {% endblock %}

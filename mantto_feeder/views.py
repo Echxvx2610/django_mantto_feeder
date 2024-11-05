@@ -74,6 +74,8 @@ def registro(request):
             except (IOError, Exception) as e:
                 return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
             
+            tiempo_de_captura = data.get('time')
+            print("Tiempo de captura:",tiempo_de_captura)
             # Antes de generar el reporte, validar el número de técnico
             try:
                 tecnico_valido = validar.user(data.get('tecnico'))
@@ -81,7 +83,7 @@ def registro(request):
                 if tecnico_valido is None:
                     return JsonResponse({'success': False, 'message': 'El No.Empleado no es válido.'}, status=400)
 
-                print("Validado función validar_tecnico")
+                #print("Validado función validar_tecnico")
             except (IOError, Exception) as e:
                 return JsonResponse({'success': False, 'message': f'Error al validar el No.Empleado: {e}'}, status=400)
 
