@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import FeederRegistro
 
-# Register your models here.
+# agregamos el modelo FeederRegistro a la administración
+admin.site.register(FeederRegistro)

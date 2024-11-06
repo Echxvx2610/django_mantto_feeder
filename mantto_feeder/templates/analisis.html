@@ -1,106 +1,59 @@
 {% extends "layout/base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Analisis{% endblock %}
 
 {% load static %}
 
 {% block content %}
 <div class="my-2 analisis">
     <h2 class="titulo_principal centrar">Analisis Mantenimiento</h2>
-    <div id="goalChart" style="width: 100%; height: 350px; margin: auto;"></div>
-    <div id="userChart" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
-
-    <div class="resumen" style="margin-top: 40px;">
-        <h3>Resumen</h3>
-        <table class="table-primary">
-            <thread>
-                <tr>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Equipos Reparados</th>
-                    <th scope="col">Tecnico Responsable</th>
-                </tr>
-            </thread>
-            <tbody>
-                <tr>
-                    <th scope="row">04/04/2023</th>
-                    <td>80</td>
-                    <td>Yamcha Cota</td>
-                </tr>
-                <tr>
-                    <th scope="row">05/04/2023</th>
-                    <td>90</td>
-                    <td>Francisco Rodriguez</td>
-                </tr>
-                <tr>
-                    <th scope="row">06/04/2023</th>
-                    <td>10</td>
-                    <td>Efrain Ramirez</td>
-                </tr>
-            </tbody>
-    </div>
+    <div id="semanaChart" style="width: 100%; height: 350px; margin: auto;"></div>
+    <div id="tecnicoChart" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
 </div>
 
 <!-- Cargar ApexCharts desde un CDN -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    // Definir la meta
-    var meta = 80;
+    // Datos pasados desde Django
+    var feedersPorSemana = {{ feeders_por_semana| safe }};
+    var semanas = {{ semanas| safe }};
+    var feedersPorTecnico = {{ feeders_por_tecnico| safe }};
+    var tecnicos = {{ tecnicos| safe }};
+    var meta = {{ meta_feeder| safe }};
+    var meta_usuario = {{ meta_usuario| safe }};
+    // Mostrar los datos en la consola
+    console.log("Valor de meta_feeder:", meta);
+    // Calcular el valor de maxY para asegurarnos de que la meta sea visible
+    var maxY = Math.max(...feedersPorSemana, meta) + 10; // Asegúrate de que la meta sea visible, sumando un margen de 10
+    var maxY2 = Math.max(...feedersPorTecnico, meta_usuario) + 10;
 
-    // Gráfico de barras con línea de meta
-    var goalOptions = {
+    // Gráfico de barras para los feeders por semana
+    var semanaOptions = {
         series: [{
-            name: 'Equipos Reparados',
-            data: [80, 90, 70, 85, 60, 80, 10, 90, 70, 85] // Datos para 10 periodos
+            name: 'Feeders Registrados',
+            data: feedersPorSemana  // Usamos los datos pasados desde Django
         }],
         chart: {
             type: 'bar',
             height: 350
         },
-        plotOptions: {
-            bar: {
-                horizontal: false,
-                columnWidth: '60%',
-                endingShape: 'rounded'
-            },
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            show: false,
-            width: 2,
-            colors: ['transparent']
-        },
         xaxis: {
-            categories: ['WK 1', 'WK 2', 'WK 3', 'WK 4', 'WK 5', 'WK 6', 'WK 7', 'WK 8', 'WK 9', 'WK 10'], // Cambia según tus periodos
+            categories: semanas  // Usamos las semanas pasadas desde Django
         },
         yaxis: {
             title: {
                 text: 'Feeders Registrados'
             },
-            labels: {
-                formatter: function (value) {
-                    return value; // Formatea según sea necesario
-                }
-            }
-        },
-        fill: {
-            opacity: 0.8
-        },
-        tooltip: {
-            y: {
-                formatter: function (value) {
-                    return value + " equipos";
-                }
-            }
+            min:0,
+            max:maxY
         },
         title: {
-            text: 'Meta feeder por semana',
+            text: 'Feeders Registrados por Semana',
             align: 'center'
         },
         annotations: {
             yaxis: [{
-                y: meta,
+                y: meta,  // Línea de meta
                 borderColor: '#FF0000',
                 label: {
                     borderColor: '#FF0000',
@@ -108,63 +61,57 @@
                         color: '#fff',
                         background: '#FF0000'
                     },
-                    text: 'Meta: ' + meta + ' equipos'
+                    text: 'Meta: ' + meta + ' Feeders'
+                },
+                strokeDashArray: 5  // Líneas discontinuas para mejorar la visibilidad
+            }]
+        }
+    };
+
+    var semanaChart = new ApexCharts(document.querySelector("#semanaChart"), semanaOptions);
+    semanaChart.render();
+
+    // Gráfico de barras para los feeders por técnico
+    var tecnicoOptions = {
+        series: [{
+            name: 'Feeders Registrados',
+            data: feedersPorTecnico  // Usamos los datos pasados desde Django
+        }],
+        chart: {
+            type: 'bar',
+            height: 350,
+        },
+        xaxis: {
+            categories: tecnicos  // Usamos los nombres de los técnicos pasados desde Django
+        },
+        yaxis: {
+            title: {
+                text: 'Feeders Registrados'
+            },
+            min : 0,
+            max : maxY2
+        },
+        title: {
+            text: 'Feeders Registrados por Técnico',
+            align: 'center'
+        },
+        annotations: {
+            yaxis: [{
+                y: meta_usuario,  // Línea de meta
+                borderColor: '#FF0000',  // Color de la línea
+                label: {
+                    borderColor: '#FF0000',
+                    style: {
+                        color: '#fff',
+                        background: '#FF0000'
+                    },
+                    text: 'Meta: ' + meta_usuario + ' Feeders'  // Texto que aparecerá junto a la línea
                 }
             }]
         }
     };
 
-    var goalChart = new ApexCharts(document.querySelector("#goalChart"), goalOptions);
-    goalChart.render();
-
-    // Gráfico de barras para 3 usuarios
-    var userOptions = {
-        series: [{
-            name: 'Equipos Reparados',
-            data: [50, 30, 70]
-        }],
-        chart: {
-            type: 'bar',
-            height: 350
-        },
-        plotOptions: {
-            bar: {
-                horizontal: false,
-                columnWidth: '55%',
-                endingShape: 'rounded'
-            },
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            show: true,
-            width: 2,
-            colors: ['transparent']
-        },
-        xaxis: {
-            categories: ['Usuario 1', 'Usuario 2', 'Usuario 3'],
-        },
-        yaxis: {
-            title: {
-                text: 'Equipos Reparados'
-            }
-        },
-        fill: {
-            opacity: 1,
-            colors: ['#9966FF', '#FF9F40', '#36A2EB']
-        },
-        tooltip: {
-            y: {
-                formatter: function (val) {
-                    return val + " equipos"
-                }
-            }
-        }
-    };
-
-    var userChart = new ApexCharts(document.querySelector("#userChart"), userOptions);
-    userChart.render();
+    var tecnicoChart = new ApexCharts(document.querySelector("#tecnicoChart"), tecnicoOptions);
+    tecnicoChart.render();
 </script>
-
 {% endblock %}
