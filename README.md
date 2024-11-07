@@ -4,6 +4,10 @@
 > instalar las dependencias del archivo requirements.txt..
 
 Software para el seguimiento de actividades de mantenimiento
+## Version Escritorio:
+![image](https://github.com/user-attachments/assets/1f14afd1-2e0b-41d7-8af0-ec561d97db08)
+
+# Version Web:
 ## Vista Home:
 ![image](https://github.com/user-attachments/assets/06a6a944-c760-4109-b404-6bd819502553)
 
