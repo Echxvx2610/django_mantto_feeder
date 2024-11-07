@@ -1,0 +1,1 @@
+// scripts aqui para mejorar la carga de paginas html

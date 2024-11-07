@@ -8,7 +8,8 @@
 <div class="my-2 analisis">
     <h2 class="titulo_principal centrar">Analisis Mantenimiento</h2>
     <div id="semanaChart" style="width: 100%; height: 350px; margin: auto;"></div>
-    <div id="tecnicoChart" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
+    <!--<div id="tecnicoChart" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div> -->
+    <div id="feederPorTecnicoSemanal" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
 </div>
 
 <!-- Cargar ApexCharts desde un CDN -->
@@ -16,36 +17,39 @@
 <script>
     // Datos pasados desde Django
     var feedersPorSemana = {{ feeders_por_semana| safe }};
+    var feedersPorTecnicoSemanal = {{ feeders_por_tecnico_semanal| safe }};
     var semanas = {{ semanas| safe }};
     var feedersPorTecnico = {{ feeders_por_tecnico| safe }};
     var tecnicos = {{ tecnicos| safe }};
     var meta = {{ meta_feeder| safe }};
     var meta_usuario = {{ meta_usuario| safe }};
-    // Mostrar los datos en la consola
-    console.log("Valor de meta_feeder:", meta);
     // Calcular el valor de maxY para asegurarnos de que la meta sea visible
     var maxY = Math.max(...feedersPorSemana, meta) + 10; // Asegúrate de que la meta sea visible, sumando un margen de 10
     var maxY2 = Math.max(...feedersPorTecnico, meta_usuario) + 10;
 
+    // Mapeamos las semanas para agregar "WK" antes de cada número
+    var semanasConPrefijo = semanas.map(function (semana) {
+        return 'WK ' + semana;
+    });
     // Gráfico de barras para los feeders por semana
     var semanaOptions = {
         series: [{
             name: 'Feeders Registrados',
-            data: feedersPorSemana  // Usamos los datos pasados desde Django
+            data: feedersPorSemana  // Usamos los datos obtenidos desde Django
         }],
         chart: {
             type: 'bar',
             height: 350
         },
         xaxis: {
-            categories: semanas  // Usamos las semanas pasadas desde Django
+            categories: semanasConPrefijo  // Usamos las semanas obtenidas desde Django
         },
         yaxis: {
             title: {
                 text: 'Feeders Registrados'
             },
-            min:0,
-            max:maxY
+            min: 0,
+            max: maxY
         },
         title: {
             text: 'Feeders Registrados por Semana',
@@ -58,8 +62,8 @@
                 label: {
                     borderColor: '#FF0000',
                     style: {
-                        color: '#fff',
-                        background: '#FF0000'
+                        color: 'white',
+                        background: 'crimson'
                     },
                     text: 'Meta: ' + meta + ' Feeders'
                 },
@@ -71,47 +75,73 @@
     var semanaChart = new ApexCharts(document.querySelector("#semanaChart"), semanaOptions);
     semanaChart.render();
 
-    // Gráfico de barras para los feeders por técnico
-    var tecnicoOptions = {
-        series: [{
-            name: 'Feeders Registrados',
-            data: feedersPorTecnico  // Usamos los datos pasados desde Django
-        }],
+    // Preparar las series para el gráfico apilado
+    var series = tecnicos.map(function (tecnico) {
+        return {
+            name: tecnico,
+            data: feedersPorTecnicoSemanal[tecnico]  // Datos de cada técnico para cada semana
+        };
+    });
+
+    var options = {
+        series: series,  // Las series que contienen los datos por técnico
         chart: {
             type: 'bar',
-            height: 350,
+            height: 500,
+            stacked: true,
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                borderRadius: 0,
+                dataLabels: {
+                    total: {
+                        enabled: true,
+                        style: {
+                            fontSize: '13px',
+                            fontWeight: 900
+                        }
+                    }
+                }
+            }
         },
         xaxis: {
-            categories: tecnicos  // Usamos los nombres de los técnicos pasados desde Django
+            categories: semanasConPrefijo,  // Las semanas como categorías en el eje X
         },
         yaxis: {
             title: {
-                text: 'Feeders Registrados'
+                text: 'Cantidad de Feeders',
             },
-            min : 0,
-            max : maxY2
+            min: 0
         },
         title: {
-            text: 'Feeders Registrados por Técnico',
-            align: 'center'
+            text: 'Feeders Registrados por Técnico (Apilado por Semana)',
+            align: 'center',
         },
         annotations: {
             yaxis: [{
-                y: meta_usuario,  // Línea de meta
-                borderColor: '#FF0000',  // Color de la línea
+                y: meta_usuario,  // Línea de meta para los usuarios
+                borderColor: '#FF0000',
                 label: {
                     borderColor: '#FF0000',
                     style: {
-                        color: '#fff',
-                        background: '#FF0000'
+                        color: 'white',
+                        background: 'crimson'
                     },
-                    text: 'Meta: ' + meta_usuario + ' Feeders'  // Texto que aparecerá junto a la línea
+                    text: 'Meta Usuario: ' + meta_usuario + ' Feeders'
                 }
             }]
+        },
+        fill: {
+            opacity: 1
+        },
+        legend: {
+            position: 'top',
+            offsetY: 0
         }
     };
 
-    var tecnicoChart = new ApexCharts(document.querySelector("#tecnicoChart"), tecnicoOptions);
-    tecnicoChart.render();
+    var chart = new ApexCharts(document.querySelector("#feederPorTecnicoSemanal"), options);
+    chart.render();
 </script>
 {% endblock %}

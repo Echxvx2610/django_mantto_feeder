@@ -145,9 +145,9 @@ def analisis(request):
     # Extraer todos los registros de la base de datos
     consulta = FeederRegistro.objects.all()
     
-    # Meta del Feeder (esta es solo una demostración, ajusta según tus necesidades)
-    meta_feeder = 30
-    meta_usuario = 10
+    # Meta del Feeder (30 y 10 por defecto)
+    meta_feeder = 80
+    meta_usuario = 30
     print("Registros totales:", total := len(consulta))
     
     # Retornar el tipo de feeder de cada feeder
@@ -168,18 +168,17 @@ def analisis(request):
         feeder_ids.append(registro.feeder_id)  # Guardar el ID del feeder
     
     # Imprimir los tipos de feeder para depuración
-    print("Tipos de feeder:", tipo_feeder)
-    
+    # print("Tipos de feeder:", tipo_feeder) # para depuración  
     # Lista de tiempos de captura
     tiempos = []
     for registro in consulta:
         tiempos.append(registro.tiempo_captura)  # Guardar el tiempo de captura
     
     # Imprimir los tiempos de captura junto con el ID del feeder
-    print("Tiempos de captura por feeder:")
+    #print("Tiempos de captura por feeder:") # para depuración 
     for feeder_id, tiempo, tipo in zip(feeder_ids, tiempos, tipo_feeder):
-        print(f"Feeder ID {feeder_id}: {tiempo} segundos, Tipo: {tipo}")
-    
+        pass
+        #print(f"Feeder ID {feeder_id}: {tiempo} segundos, Tipo: {tipo}") # para depuración 
     # Obtener el técnico desde la solicitud GET (si existe)
     tecnico = request.GET.get('tecnico', "00000")
     
@@ -187,16 +186,18 @@ def analisis(request):
     if tecnico:
         consulta = FeederRegistro.objects.filter(tecnico=tecnico)
         if consulta.exists():
-            print(f"Registros para el técnico {tecnico}:")
+            #print(f"Registros para el técnico {tecnico}:") # para depuración
             for registro in consulta:
-                print(f"Feeder ID: {registro.feeder_id}, Técnico: {registro.tecnico}")
+                pass
+                #print(f"Feeder ID: {registro.feeder_id}, Técnico: {registro.tecnico}") # para depuración
         else:
-            print(f"No se encontraron registros para el técnico: {tecnico}")
+            #print(f"No se encontraron registros para el técnico: {tecnico}") # para depuración
             consulta = FeederRegistro.objects.all()  # Vuelve a obtener todos los registros
     else:
-        print("Mostrando todos los registros de feeders:")
+        #print("Mostrando todos los registros de feeders:")
         for registro in consulta:
-            print(f"Feeder ID: {registro.feeder_id}, Técnico: {registro.tecnico}")
+            pass
+            #print(f"Feeder ID: {registro.feeder_id}, Técnico: {registro.tecnico}")
     
     # Obtener la semana actual del año
     fecha_actual = date.today()
@@ -221,11 +222,32 @@ def analisis(request):
     tecnicos = list(feeders_por_tecnico.keys())
     feeders_tecnico = [feeders_por_tecnico.get(tecnico, 0) for tecnico in tecnicos]
 
+    # Contar los feeders por semana y por técnico
+    feeders_por_semana_tecnico = defaultdict(lambda: defaultdict(int))  # Semana -> Técnico -> Contador de feeders
+    for registro in consulta:
+        semana = registro.fecha_mantenimiento.isocalendar()[1]  # Obtener la semana
+        feeders_por_semana_tecnico[semana][registro.tecnico] += 1
+
+    # Preparar los datos para las semanas (categorías del gráfico)
+    semanas = sorted(feeders_por_semana_tecnico.keys())  # Las semanas, ordenadas
+    # Obtener los técnicos
+    tecnicos = list(set(tecnico for semana in feeders_por_semana_tecnico.values() for tecnico in semana.keys())) 
+    tecnicos.sort()  # Ordenar los técnicos alfabéticamente si lo deseas
+
+    # Preparar los datos para el gráfico apilado (por cada técnico, por cada semana)
+    feeders_por_tecnico_semanal = {tecnico: [] for tecnico in tecnicos}
+    for semana in semanas:
+        for tecnico in tecnicos:
+            feeders_por_tecnico_semanal[tecnico].append(feeders_por_semana_tecnico[semana].get(tecnico, 0))
+
+    
+    
     # Pasar los datos a la plantilla
     context = {
         'feeders_por_semana': feeders_semana,
         'semanas': semanas,
         'feeders_por_tecnico': feeders_tecnico,
+        'feeders_por_tecnico_semanal': feeders_por_tecnico_semanal,
         'tecnicos': tecnicos,
         'meta_feeder': meta_feeder,
         'meta_usuario': meta_usuario,
