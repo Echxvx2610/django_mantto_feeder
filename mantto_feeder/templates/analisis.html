@@ -8,21 +8,24 @@
 <div class="my-2 analisis">
     <h2 class="titulo_principal centrar">Analisis Mantenimiento</h2>
     <div id="semanaChart" style="width: 100%; height: 350px; margin: auto;"></div>
-    <!--<div id="tecnicoChart" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div> -->
     <div id="feederPorTecnicoSemanal" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
+    <!-- Nuevo gráfico de dispersión para los tiempos de captura por tipo de feeder -->
+    <div id="tiemposPorTipoFeeder" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
 </div>
 
 <!-- Cargar ApexCharts desde un CDN -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     // Datos pasados desde Django
-    var feedersPorSemana = {{ feeders_por_semana| safe }};
-    var feedersPorTecnicoSemanal = {{ feeders_por_tecnico_semanal| safe }};
-    var semanas = {{ semanas| safe }};
-    var feedersPorTecnico = {{ feeders_por_tecnico| safe }};
-    var tecnicos = {{ tecnicos| safe }};
-    var meta = {{ meta_feeder| safe }};
-    var meta_usuario = {{ meta_usuario| safe }};
+    var feedersPorSemana = {{ feeders_por_semana|safe }};
+    var feedersPorTecnicoSemanal = {{ feeders_por_tecnico_semanal|safe }};
+    var semanas = {{ semanas|safe }};
+    var feedersPorTecnico = {{ feeders_por_tecnico|safe }};
+    var tecnicos = {{ tecnicos|safe }};
+    var meta = {{ meta_feeder|safe }};
+    var meta_usuario = {{ meta_usuario|safe }};
+    var feederTipoTiempo = {{ feeder_tipo_tiempo|safe }};  // Nuevo contexto para los tiempos de captura por tipo de feeder
+    //console.log(feederTipoTiempo);
     // Calcular el valor de maxY para asegurarnos de que la meta sea visible
     var maxY = Math.max(...feedersPorSemana, meta) + 10; // Asegúrate de que la meta sea visible, sumando un margen de 10
     var maxY2 = Math.max(...feedersPorTecnico, meta_usuario) + 10;
@@ -31,6 +34,7 @@
     var semanasConPrefijo = semanas.map(function (semana) {
         return 'WK ' + semana;
     });
+
     // Gráfico de barras para los feeders por semana
     var semanaOptions = {
         series: [{
@@ -143,5 +147,76 @@
 
     var chart = new ApexCharts(document.querySelector("#feederPorTecnicoSemanal"), options);
     chart.render();
+
+    // Obtener los tipos de feeders
+    var feederTypes = Object.keys(feederTipoTiempo);  // Tipos de feeders, como 'CP', 'QP', 'HOVER', etc.
+
+    // Preparar los datos para el gráfico de dispersión
+    var seriesTiempos = feederTypes.map(function(tipo) {
+        var tiempos = feederTipoTiempo[tipo];  // Los tiempos de captura para este tipo
+        // Crear puntos en el gráfico, cada punto representa un tiempo de captura de un feeder
+        var puntos = tiempos.map(function(tiempo, index) {
+            return { x: tipo + ' ' + (index + 1), y: tiempo };  // x es un ID simulado, y es el tiempo de captura
+        });
+
+        return {
+            name: tipo,
+            data: puntos
+        };
+    });
+
+    // Configuración del gráfico
+    var tiempoOptions = {
+        series: seriesTiempos,
+        chart: {
+            type: 'scatter',
+            height: 400
+        },
+        xaxis: {
+            // categories: feederTypes,  // Las categorías en el eje X son los tipos de feeders
+            categories: feederTypes,
+            title: {
+                text: 'Tipo de Feeder'
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'Tiempo de Captura (segundos)'
+            },
+            min: 0,
+            // Ajustar a el mayor tiempo de captura en todos los feeders
+            max: Math.max(...Object.values(feederTipoTiempo).flat())
+        },
+        title: {
+            text: 'Tiempos de Captura por Tipo de Feeder',
+            align: 'center'
+        },
+        tooltip: {
+            x: {
+                formatter: function(value) {
+                    return 'Feeder: ' + value;  // Mostrar el ID simulado
+                }
+            },
+            y: {
+                formatter: function(value) {
+                    return value.toFixed(2) + ' seg';  // Mostrar el tiempo con 2 decimales
+                }
+            }
+        },
+        markers: {
+            size: 4
+        },
+        plotOptions: {
+            scatter: {
+                marker: {
+                    size: 5
+                }
+            }
+        }
+    };
+
+    // Crear y renderizar el gráfico
+    var tiempoChart = new ApexCharts(document.querySelector("#tiemposPorTipoFeeder"), tiempoOptions);
+    tiempoChart.render();
 </script>
 {% endblock %}

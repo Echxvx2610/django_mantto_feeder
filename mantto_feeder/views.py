@@ -143,42 +143,40 @@ def home(request):
 
 def analisis(request):
     # Extraer todos los registros de la base de datos
-    consulta = FeederRegistro.objects.all()
+    consulta = FeederRegistro.objects.all()[:100]
     
     # Meta del Feeder (30 y 10 por defecto)
     meta_feeder = 80
     meta_usuario = 30
     print("Registros totales:", total := len(consulta))
     
-    # Retornar el tipo de feeder de cada feeder
-    tipo_feeder = []
-    feeder_ids = []  # Para guardar los IDs de feeders
-    for registro in consulta:
-        if registro.CP == "OK":
-            tipo_feeder.append("CP")
-        elif registro.QP == "OK":
-            tipo_feeder.append("QP")
-        elif registro.HOVER == "OK":
-            tipo_feeder.append("HOVER")
-        elif registro.BFC == "OK":
-            tipo_feeder.append("BFC")
-        else:
-            tipo_feeder.append("Desconocido")  # Si no es "OK", se puede considerar como un tipo desconocido
+    # Crear el diccionario para guardar tipo_feeder y su respectivo tiempo
+    feeder_tipo_tiempo = {
+        "CP": [],
+        "QP": [],
+        "HOVER": [],
+        "BFC": [],
+        "Desconocido": []  # Si no coincide con ningún tipo conocido
+    }
 
-        feeder_ids.append(registro.feeder_id)  # Guardar el ID del feeder
-    
-    # Imprimir los tipos de feeder para depuración
-    # print("Tipos de feeder:", tipo_feeder) # para depuración  
-    # Lista de tiempos de captura
-    tiempos = []
-    for registro in consulta:
-        tiempos.append(registro.tiempo_captura)  # Guardar el tiempo de captura
-    
-    # Imprimir los tiempos de captura junto con el ID del feeder
-    #print("Tiempos de captura por feeder:") # para depuración 
-    for feeder_id, tiempo, tipo in zip(feeder_ids, tiempos, tipo_feeder):
-        pass
-        #print(f"Feeder ID {feeder_id}: {tiempo} segundos, Tipo: {tipo}") # para depuración 
+    # Llenar el diccionario con los datos de feeder_id, tipo_feeder y tiempo_captura
+    for resultado in consulta:
+        tipo = "Desconocido"  # Valor por defecto si no se encuentra un tipo válido
+        
+        # Identificar el tipo de feeder basado en los valores de los campos
+        if resultado.CP == "OK":
+            tipo = "CP"
+        elif resultado.QP == "OK":
+            tipo = "QP"
+        elif resultado.HOVER == "OK":
+            tipo = "HOVER"
+        elif resultado.BFC == "OK":
+            tipo = "BFC"
+        
+        # Añadir al diccionario el (feeder_id, tiempo_captura)
+        feeder_tipo_tiempo[tipo].append((resultado.feeder_id, resultado.tiempo_captura))
+        
+        
     # Obtener el técnico desde la solicitud GET (si existe)
     tecnico = request.GET.get('tecnico', "00000")
     
@@ -239,7 +237,6 @@ def analisis(request):
     for semana in semanas:
         for tecnico in tecnicos:
             feeders_por_tecnico_semanal[tecnico].append(feeders_por_semana_tecnico[semana].get(tecnico, 0))
-
     
     
     # Pasar los datos a la plantilla
@@ -249,10 +246,11 @@ def analisis(request):
         'feeders_por_tecnico': feeders_tecnico,
         'feeders_por_tecnico_semanal': feeders_por_tecnico_semanal,
         'tecnicos': tecnicos,
-        'meta_feeder': meta_feeder,
-        'meta_usuario': meta_usuario,
-        'tiempos': tiempos,
-        'tipo_feeder': tipo_feeder,  # Agregar la lista de tipos de feeders a la plantilla
+        'meta_feeder': meta_feeder, 
+        'meta_usuario': meta_usuario, 
+        #'tiempos': tiempos,
+        #'tipo_feeder': tipo_feeder,  
+        'feeder_tipo_tiempo': feeder_tipo_tiempo
     }
 
     return render(request, 'analisis.html', context)
