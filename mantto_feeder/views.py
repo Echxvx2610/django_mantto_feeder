@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse,JsonResponse
 import json
-from .tools import crear_plantilla,search_feeder,progress,loggin,validar
+from .tools import crear_plantilla,search_feeder,validar
 from collections import defaultdict
 from .models import FeederRegistro
 import datetime

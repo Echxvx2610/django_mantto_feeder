@@ -8,7 +8,6 @@ from openpyxl.utils import get_column_letter
 from datetime import datetime,time
 import asyncio
 import tracemalloc
-import PySimpleGUI as sg
 """
 #testeo de memoria tracemalloc
 tracemalloc.start()
