@@ -152,7 +152,8 @@
 
         // Reiniciar el tiempo antes de empezar
         elapsedTime = 0;  // Reiniciamos el contador a cero
-        document.getElementById('time').value = "00:00:00";  // Reiniciar el campo de tiempo visual
+        time_lap = "00:00:00";
+        //document.getElementById('time').value = "00:00:00";  // Reiniciar el campo de tiempo visual
 
         isTimerRunning = true;
         timerInterval = setInterval(() => {
@@ -163,7 +164,8 @@
 
             // Mostrar el tiempo en el campo "Tiempo de Captura"
             const timeFormatted = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
-            document.getElementById('time').value = timeFormatted;  // Actualizar el campo de tiempo
+            //document.getElementById('time').value = timeFormatted;  // Actualizar el campo de tiempo
+            time_lap = timeFormatted
         }, 1000);  // Actualizar cada segundo
     }
 
@@ -292,7 +294,7 @@
         select.addEventListener('change', handleSelectChange);
     });
 
-
+    // Función para recolectar los datos del formulario
     function recolectarDatosFormulario(event) {
         event.preventDefault();  // Evita que el formulario se envíe automáticamente
         const formulario = document.getElementById('formularioFeeder');
@@ -369,6 +371,8 @@
                     tecnicoInput.disabled = true; // Deshabilitamos de nuevo el campo
 
                     datosFormulario['tecnico'] = result.value; // Guardamos el valor en el objeto
+                    // agregar time_lap a datosFormulario
+                    datosFormulario['time'] = time_lap;
                     enviarDatos(datosFormulario);
                 }
             });
@@ -495,8 +499,8 @@
         // Detener el cronómetro y restablecer el tiempo
         stopTimer();  // Detener el cronómetro
         elapsedTime = 0;  // Restablecer el tiempo acumulado a 0
-        document.getElementById('time').value = "00:00:00";  // Resetear el campo de tiempo en la interfaz
-
+        //document.getElementById('time').value = "00:00:00";  // Resetear el campo de tiempo en la interfaz
+        time_lap = "00:00:00";
         // Mensaje opcional de confirmación de reseteo usando SweetAlert
         Swal.fire({
             title: 'Formulario reiniciado',
