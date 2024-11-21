@@ -427,7 +427,18 @@
                         ctx.fillRect(0, 0, canvas.width, canvas.height);  // Rellenar el rectángulo del canvas
 
                         // Reiniciar el formulario
-                        document.getElementById('formularioFeeder').reset();
+                        const formulario = document.getElementById('formularioFeeder');
+                        formulario.reset();  // Resetea los campos estándar
+
+                        // Restablecer los selects a "NG"
+                        Array.from(formulario.elements).forEach(element => {
+                            if (element.type === 'select-one') {
+                                element.value = 'NG';  // Cambiar todos los selects a "NG"
+                                element.disabled = false;  // Habilitar los selects
+                            }
+                        });
+
+                        // Limpiar el canvas de status
                         const statusCanvas = document.getElementById('status-canvas');
                         const ctx2 = statusCanvas.getContext('2d');
                         ctx2.clearRect(0, 0, statusCanvas.width, statusCanvas.height);

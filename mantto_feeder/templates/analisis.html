@@ -17,14 +17,14 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     // Datos pasados desde Django
-    var feedersPorSemana = {{ feeders_por_semana|safe }};
-    var feedersPorTecnicoSemanal = {{ feeders_por_tecnico_semanal|safe }};
-    var semanas = {{ semanas|safe }};
-    var feedersPorTecnico = {{ feeders_por_tecnico|safe }};
-    var tecnicos = {{ tecnicos|safe }};
-    var meta = {{ meta_feeder|safe }};
-    var meta_usuario = {{ meta_usuario|safe }};
-    var feederTipoTiempo = {{ feeder_tipo_tiempo|safe }};  // Nuevo contexto para los tiempos de captura por tipo de feeder
+    var feedersPorSemana = {{ feeders_por_semana| safe }};
+    var feedersPorTecnicoSemanal = {{ feeders_por_tecnico_semanal| safe }};
+    var semanas = {{ semanas| safe }};
+    var feedersPorTecnico = {{ feeders_por_tecnico| safe }};
+    var tecnicos = {{ tecnicos| safe }};
+    var meta = {{ meta_feeder| safe }};
+    var meta_usuario = {{ meta_usuario| safe }};
+    var feederTipoTiempo = {{ feeder_tipo_tiempo| safe }};  // Nuevo contexto para los tiempos de captura por tipo de feeder
     //console.log(feederTipoTiempo);
     // Calcular el valor de maxY para asegurarnos de que la meta sea visible
     var maxY = Math.max(...feedersPorSemana, meta) + 10; // Asegúrate de que la meta sea visible, sumando un margen de 10
@@ -151,11 +151,22 @@
     // Obtener los tipos de feeders
     var feederTypes = Object.keys(feederTipoTiempo);  // Tipos de feeders, como 'CP', 'QP', 'HOVER', etc.
 
+    // Función para convertir segundos a minutos:segundos si es mayor o igual a 60
+    function formatTime(seconds) {
+        if (seconds >= 60) {
+            var minutes = Math.floor(seconds / 60);  // Obtener los minutos
+            var remainingSeconds = seconds % 60;    // Obtener los segundos restantes
+            return minutes + ':' + (remainingSeconds < 10 ? '0' : '') + remainingSeconds + ' min';  // Formatear como "m:ss"
+        } else {
+            return seconds + ' seg';  // Mostrar como segundos si es menor a 60
+        }
+    }
+
     // Preparar los datos para el gráfico de dispersión
-    var seriesTiempos = feederTypes.map(function(tipo) {
+    var seriesTiempos = feederTypes.map(function (tipo) {
         var tiempos = feederTipoTiempo[tipo];  // Los tiempos de captura para este tipo
         // Crear puntos en el gráfico, cada punto representa un tiempo de captura de un feeder
-        var puntos = tiempos.map(function(tiempo, index) {
+        var puntos = tiempos.map(function (tiempo, index) {
             return { x: tipo + ' ' + (index + 1), y: tiempo };  // x es un ID simulado, y es el tiempo de captura
         });
 
@@ -173,7 +184,6 @@
             height: 400
         },
         xaxis: {
-            // categories: feederTypes,  // Las categorías en el eje X son los tipos de feeders
             categories: feederTypes,
             title: {
                 text: 'Tipo de Feeder'
@@ -181,10 +191,10 @@
         },
         yaxis: {
             title: {
-                text: 'Tiempo de Captura (segundos)'
+                text: 'Tiempo de Captura'
             },
             min: 0,
-            // Ajustar a el mayor tiempo de captura en todos los feeders
+            // Ajustar al mayor tiempo de captura en todos los feeders
             max: Math.max(...Object.values(feederTipoTiempo).flat())
         },
         title: {
@@ -193,13 +203,13 @@
         },
         tooltip: {
             x: {
-                formatter: function(value) {
+                formatter: function (value) {
                     return 'Feeder: ' + value;  // Mostrar el ID simulado
                 }
             },
             y: {
-                formatter: function(value) {
-                    return value.toFixed(2) + ' seg';  // Mostrar el tiempo con 2 decimales
+                formatter: function (value) {
+                    return formatTime(value);  // Convertir el tiempo según sea en segundos o minutos
                 }
             }
         },
@@ -218,5 +228,7 @@
     // Crear y renderizar el gráfico
     var tiempoChart = new ApexCharts(document.querySelector("#tiemposPorTipoFeeder"), tiempoOptions);
     tiempoChart.render();
+
+
 </script>
 {% endblock %}
