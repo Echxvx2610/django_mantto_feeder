@@ -5,8 +5,86 @@
 {% load static %}
 
 {% block content %}
+<!-- Estilos personalizados -->
+<style>
+    /* Estilo para resaltar la semana actual */
+    .current-week {
+        background-color: #d2b48c;
+        /* Color café */
+    }
+
+    /* Estilo para resaltar la siguiente semana */
+    .next-week {
+        background-color: #90ee90;
+        /* Color verde claro */
+    }
+
+    /* Estilo para la fecha actual */
+    .today {
+        background-color: white !important; /* Fondo blanco */
+        color: red !important; /* Letras rojas */
+        font-weight: bold; /* Texto en negrita */
+    }
+</style>
+
+<!-- Contenido principal del calendario -->
 <div class="box_home">
-    <h2 class="titulo_principal centrar">Bienvenido a la página de inicio</h2>
-    <p class="centrar">Has iniciado sesión correctamente.</p>    
+    <h2 class="titulo_principal centrar"> Calendario de Mantenimiento </h2>
 </div>
+
+<div id="calendar" style="margin: 20px auto; max-width: 900px;"></div>
+
+<!-- Script del calendario -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth', // Vista predeterminada
+            headerToolbar: {            // Barra de herramientas del calendario
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridDay,timeGridWeek,dayGridMonth'
+            },
+            dayCellClassNames: function (date) {
+                const today = new Date(); // Fecha actual
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay()); // Inicio de la semana actual
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6); // Fin de la semana actual
+
+                const nextWeekStart = new Date(weekEnd);
+                nextWeekStart.setDate(weekEnd.getDate() + 1); // Inicio de la siguiente semana
+                const nextWeekEnd = new Date(nextWeekStart);
+                nextWeekEnd.setDate(nextWeekStart.getDate() + 6); // Fin de la siguiente semana
+
+                const currentDate = date.date;
+
+                // Clase para la fecha actual
+                if (
+                    currentDate.getFullYear() === today.getFullYear() &&
+                    currentDate.getMonth() === today.getMonth() &&
+                    currentDate.getDate() === today.getDate()
+                ) {
+                    return ['today'];
+                }
+
+                // Condiciones para la semana actual
+                if (currentDate >= weekStart && currentDate <= weekEnd) {
+                    return ['current-week'];
+                }
+
+                // Condiciones para la siguiente semana
+                if (currentDate >= nextWeekStart && currentDate <= nextWeekEnd) {
+                    return ['next-week'];
+                }
+
+                return []; // Sin clase adicional
+            },
+        });
+
+        calendar.render();
+    });
+</script>
 {% endblock %}

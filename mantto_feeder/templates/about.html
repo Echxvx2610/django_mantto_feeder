@@ -25,17 +25,17 @@
 <body>
     <div class="container mt-5">
         <!-- Título de la página -->
-        <h1 class="mb-4 text-center titulo_principal centrar">About</h1>
+        <h1 class="mb-4 text-center titulo_principal centrar">Sobre esta Aplicación</h1>
         <!-- Fila para la tarjeta y el carrusel -->
         <div class="row">
             <!-- Columna de la tarjeta de información -->
             <div class="col-md-6">
                 <div class="card shadow-sm mb-4">
                     <!-- Imagen de la tarjeta -->
-                    <img src="{% static 'myapp/logo_github.png' %}" class="card-img-top" alt="logo github">
+                    <img src="{% static 'img/perfil_github.png' %}" class="card-img-top" alt="logo github">
                     <div class="card-body">
                         <!-- Descripción dentro de la tarjeta -->
-                        <p class="card-text">Esta página fue creada por Cristian Echevarria.</p>
+                        <p class="card-text">El desarrollo de este proyecto ha sido realizado por Cristian Echevarria me encuentro en github como <span><a href="https://github.com/Echxvx2610" target="_blank">https://github.com/Echxvx2610</a></span></p>
                         <!-- Descripción adicional -->
                         <p class="card-text">Aplicacion web creada con Django para el seguimiento de actividades y mantenimiento de feeders. En ella, se utilizaron sus funciones básicas de Django, Jinja2 para plantillas, y Bootstrap para estilos.</p>
                     </div>
@@ -44,23 +44,23 @@
             <!-- Columna del carrusel -->
             <div class="col-md-6">
                 <!-- Carrusel de tecnologías -->
-                <div id="carouselTech" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                <div id="carouselTech" class="carousel slide" data-bs-ride="carousel" data-bs-interval="1000">
                     <div class="carousel-inner">
                         <!-- Imagen de Python -->
                         <div class="carousel-item active">
-                            <img src="{% static 'myapp/python.png' %}" class="d-block w-100" alt="Python">
+                            <img src="{% static 'img/python.svg' %}" class="d-block w-100" alt="Python">
                         </div>
                         <!-- Imagen de Django -->
                         <div class="carousel-item">
-                            <img src="{% static 'myapp/django.png' %}" class="d-block w-100" alt="Django">
+                            <img src="{% static 'img/django.svg' %}" class="d-block w-100" alt="Django">
                         </div>
                         <!-- Imagen de Jinja2 -->
                         <div class="carousel-item">
-                            <img src="{% static 'myapp/jinja2.png' %}" class="d-block w-100" alt="Jinja2">
+                            <img src="{% static 'img/jinja2.png' %}" class="d-block w-100" alt="Jinja2">
                         </div>
                         <!-- Imagen de Bootstrap -->
                         <div class="carousel-item">
-                            <img src="{% static 'myapp/bootstrap.png' %}" class="d-block w-100" alt="Bootstrap">
+                            <img src="{% static 'img/boostrap.png' %}" class="d-block w-100" alt="Bootstrap">
                         </div>
                     </div>
                     <!-- Controles de navegación del carrusel -->
