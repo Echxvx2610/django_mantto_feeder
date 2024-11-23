@@ -7,11 +7,13 @@
 .calendar-controls button,
 .calendar-controls select {
     margin: 0 10px;
-    padding: 5px 10px;
+    padding: 10px 10px;
     background-color: #075964;
     color : white;
     font-weight: bold;
     font-family: monospace;
+    border-radius: 10px;
+    border: none;
 }
 
 .calendar-container {
@@ -26,7 +28,7 @@
     border: 2px solid #0c6a70;
     border-radius: 5px;
     box-sizing: border-box;
-    box-shadow: #075964 5px 10px;
+    box-shadow: #0c6a70 5px 10px;
 }
 
 .month-header {
