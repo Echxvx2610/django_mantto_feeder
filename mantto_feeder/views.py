@@ -3,9 +3,11 @@ from django.http import HttpResponse,JsonResponse
 import json
 from .tools import crear_plantilla,search_feeder,validar
 from collections import defaultdict
-from .models import FeederRegistro
+from .models import FeederRegistro,Cronometro
 import datetime
 from datetime import date,datetime
+from django.utils import timezone
+
 
 def consultar(request):
     #remplaza funcion check_status() --> app mantto_feeder
@@ -16,19 +18,32 @@ def consultar(request):
             return JsonResponse({"error": "ID no proporcionado."}, status=400)
 
         try:
-            feeder_id = int(feeder_id)  # Convertimos a entero
+            feeder_id = str(feeder_id)  # Convertimos a entero
+            #print(feeder_id,type(feeder_id))
+            
             #obteniene un diccionario de search_id
             resultado = search_feeder.search_id(feeder_id)
+            #print(resultado)
+            
             #obteniene una lista de cell_value para determinar estado(OK,P,"")
             valor_celda = search_feeder.cell_value(feeder_id)[0]
+            #print("valor_celda:",valor_celda)
+            
             #codigo de feeder
             codigo = search_feeder.cell_value(feeder_id)[2]
+            #print("codigo:",codigo)
+            
             #color de feeder
             color_feeder = search_feeder.cell_value(feeder_id)[1]
+            #print("color_feeder:",color_feeder)
+            
             #color de semana
             fecha_actual = datetime.now()
             fecha_formateada = fecha_actual.strftime(f'{fecha_actual.month}/{fecha_actual.day}/{fecha_actual.year}')
+            #print("fecha_formateada:",fecha_formateada)
+            
             color_semana = search_feeder.search_fecha(fecha_formateada)[1]
+            #print("color_semana:",color_semana)
             #diccionario para transmitir resultados en json
             resultados_dict = {
                 'id_feeder': resultado['id_feeder'],
@@ -38,6 +53,7 @@ def consultar(request):
                 'color_semana': color_semana,
                 'valor_celda': valor_celda
             }
+            #print(resultados_dict)
             if not resultado:
                 return JsonResponse({"error": "Feeder no encontrado."}, status=404)
 
@@ -50,6 +66,58 @@ def consultar(request):
 
     return render(request, 'registro.html')
 
+def iniciar_cronometro(request):
+    if request.method == 'POST':
+        try:
+            # Extraer datos del JSON
+            data = json.loads(request.body)
+            print("Datos recibidos en iniciar_cronometro:", data)
+
+            # Obtener feeder_id
+            feeder_id = data.get('id-feeder')
+            print("Feeder ID:", feeder_id)
+            # Obtener el tiempo de inicio, asegurándonos de que sea un timestamp válido
+            tiempo_inicio = data.get('tiempo_inicio')
+            if tiempo_inicio:
+                # Convertir timestamp a datetime aware
+                tiempo_inicio = datetime.fromtimestamp(tiempo_inicio)
+                tiempo_inicio = timezone.make_aware(tiempo_inicio)  # Hace la fecha aware con la zona horaria actual
+                print("Tiempo inicio:", tiempo_inicio)
+            else:
+                return JsonResponse({'success': False, 'message': 'tiempo_inicio es requerido.'}, status=400)
+            
+            # Crear el objeto Cronometro con tiempo_fin como None
+            cronometro = Cronometro(tiempo_inicio=tiempo_inicio, tiempo_fin=None ,feeder_id=feeder_id)
+            cronometro.save()  # Guarda en la base de datos
+            print("Cronómetro guardado:", cronometro)
+            
+            return JsonResponse({'success': True, 'message': 'Cronómetro guardado correctamente.', 'id': cronometro.id})
+        except Exception as e:
+            print("Error al guardar cronómetro:", str(e))
+            return JsonResponse({'success': False, 'message': f'Error al guardar cronómetro: {str(e)}'}, status=400)
+    return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
+
+def detener_cronometro(request, cronometro_id):
+    """Detiene el cronómetro y devuelve el tiempo de captura."""
+    if request.method == 'POST':
+        try:
+            cronometro = Cronometro.objects.get(id=cronometro_id)
+            if cronometro.tiempo_fin is not None:
+                return JsonResponse({'success': False, 'error': 'El cronómetro ya fue detenido'}, status=400)
+            
+            cronometro.tiempo_fin = timezone.now()
+            print("Tiempo fin:", cronometro.tiempo_fin)
+            cronometro.save()
+
+            tiempo_captura = cronometro.calcular_tiempo_captura()
+            return JsonResponse({'success': True, 'tiempo_captura': tiempo_captura})
+        except Cronometro.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Cronómetro no encontrado'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': f'Error al detener el cronómetro: {str(e)}'}, status=500)
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
+
 def registro(request):
     if request.method == 'POST':
         try:
@@ -57,7 +125,7 @@ def registro(request):
             data = json.loads(request.body)
             print("Datos del JSON:", data)
             
-            feeder_id = int(data.get('id-feeder'))
+            feeder_id = str(data.get('id-feeder'))
             feeder_name = data.get('feeder')
             feeder_code = data.get('codigo-feeder')
             color_feeder = data.get('color-feeder')

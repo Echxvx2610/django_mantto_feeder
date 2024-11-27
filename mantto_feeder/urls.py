@@ -12,4 +12,6 @@ urlpatterns = [
     path('about/',views.about ,name='about'),
     path('registro/',views.registro ,name='registro'),
     path('consultar/',views.consultar ,name='consultar'),
+    path('iniciar_cronometro/', views.iniciar_cronometro, name='iniciar_cronometro'),
+    path('detener_cronometro/<int:cronometro_id>/', views.detener_cronometro, name='detener_cronometro'),
 ]

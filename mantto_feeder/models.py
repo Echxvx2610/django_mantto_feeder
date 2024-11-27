@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class FeederRegistro(models.Model):
     # Campos correspondientes al JSON
@@ -26,3 +27,19 @@ class FeederRegistro(models.Model):
     
     def __str__(self):
         return f"Feeder {self.feeder_name} - ID {self.feeder_id}"
+    
+
+class Cronometro(models.Model):
+    # Si 'feeder_id' es un campo que no permite valores nulos, debes dar un valor por defecto
+    feeder_id = models.CharField(max_length=255)  # Definir un valor por defecto
+    tiempo_inicio = models.DateTimeField(default=timezone.now)
+    tiempo_fin = models.DateTimeField(null=True, blank=True)
+
+    def calcular_tiempo_captura(self):
+        if self.tiempo_fin:
+            diferencia = self.tiempo_fin - self.tiempo_inicio
+            return diferencia.total_seconds()  # Devuelve el tiempo en segundos
+        return 0  # Si no se ha detenido el cronómetro, retorna 0
+
+    def __str__(self):
+        return f"Cronómetro para Feeder {self.feeder_id}"

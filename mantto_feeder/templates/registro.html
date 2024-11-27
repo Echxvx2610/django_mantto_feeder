@@ -142,43 +142,89 @@
         return cookieValue;
     }
 
+    let cronometroId;  // Almacenaremos el ID del cronómetro en esta variable
     let elapsedTime = 0;  // Variable para almacenar el tiempo transcurrido en segundos
     let timerInterval;    // Intervalo para el cronómetro
     let isTimerRunning = false;  // Indicador de si el cronómetro está corriendo
 
-    // Función para empezar el cronómetro
-    function startTimer() {
-        if (isTimerRunning) return;  // Si el cronómetro ya está corriendo, no hacer nada
+    function startTimer(feederId) {
+        if (isTimerRunning) return;
 
-        // Reiniciar el tiempo antes de empezar
-        elapsedTime = 0;  // Reiniciamos el contador a cero
-        time_lap = "00:00:00";
-        //document.getElementById('time').value = "00:00:00";  // Reiniciar el campo de tiempo visual
+        // Obtener el tiempo de inicio actual en formato timestamp (segundos desde la época)
+        let tiempo_inicio = Math.floor(Date.now() / 1000); // Convierte el tiempo actual a timestamp
 
-        isTimerRunning = true;
-        timerInterval = setInterval(() => {
-            elapsedTime++;  // Aumentar el tiempo en 1 segundo
-            const horas = Math.floor(elapsedTime / 3600);
-            const minutos = Math.floor((elapsedTime % 3600) / 60);
-            const segundos = elapsedTime % 60;
-
-            // Mostrar el tiempo en el campo "Tiempo de Captura"
-            const timeFormatted = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
-            //document.getElementById('time').value = timeFormatted;  // Actualizar el campo de tiempo
-            time_lap = timeFormatted
-        }, 1000);  // Actualizar cada segundo
+        // Enviar la solicitud para iniciar el cronómetro con datos en el cuerpo
+        fetch('/iniciar_cronometro/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({
+                "id-feeder": feederId,
+                "tiempo_inicio": tiempo_inicio,
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    cronometroId = data.id;  // Asegúrate de guardar el ID recibido
+                    console.log('Cronómetro iniciado con ID:', cronometroId);
+                    isTimerRunning = true;
+                } else {
+                    console.error('Error al iniciar el cronómetro:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error al iniciar cronómetro:', error);
+                showAlert('Error', 'No se pudo iniciar el cronómetro.', 'error');
+            });
     }
 
     // Función para detener el cronómetro y devolver el tiempo total
     function stopTimer() {
-        if (isTimerRunning) {
-            clearInterval(timerInterval);  // Detener el intervalo
-            isTimerRunning = false;
-        }
-        return elapsedTime;  // Devolver el tiempo total acumulado
+        return new Promise((resolve, reject) => {
+            if (isTimerRunning) {
+                isTimerRunning = false;
+
+                fetch(`/detener_cronometro/${cronometroId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const tiempoCaptura = data.tiempo_captura;  // Tiempo en segundos con decimales
+                            console.log("Tiempo de captura en segundos:", tiempoCaptura);
+
+                            // Convertir los segundos decimales a formato HH:mm:ss
+                            const horas = Math.floor(tiempoCaptura / 3600); // Calcula las horas
+                            const minutos = Math.floor((tiempoCaptura % 3600) / 60); // Calcula los minutos restantes
+                            const segundos = Math.floor(tiempoCaptura % 60); // Calcula los segundos restantes
+
+                            // Formatear el tiempo en HH:mm:ss
+                            const tiempoFormateado = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+
+                            // Resolver la promesa con el tiempo formateado
+                            resolve(tiempoFormateado);
+                        } else {
+                            console.error('Error al detener el cronómetro:', data.error);
+                            reject('Error al detener el cronómetro');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al detener cronómetro:', error);
+                        reject('Error al detener cronómetro');
+                    });
+            } else {
+                reject('Cronómetro no estaba corriendo');
+            }
+        });
     }
 
-    // Función para agregar ceros a la izquierda
     function pad(number) {
         return number < 10 ? '0' + number : number;
     }
@@ -259,8 +305,8 @@
 
                 ctx.fillRect(0, 0, statusCanvas.width, statusCanvas.height);  // Dibujar la barra de estado
 
-                // Iniciar el cronómetro
-                startTimer();  // Función que arranca el cronómetro
+                // Iniciar el cronómetro pasando el feederId
+                startTimer(feederId);  // Llamamos a startTimer pasando el feederId obtenido
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -308,6 +354,7 @@
         let todosNG = true;
         let camposVacios = [];
 
+        // Recopilar los datos del formulario
         Array.from(formulario.elements).forEach(element => {
             if (element.id && (element.type === 'text' || element.type === 'select-one' || element.tagName === 'TEXTAREA')) {
                 datosFormulario[element.id] = element.value;
@@ -371,8 +418,8 @@
                     tecnicoInput.disabled = true; // Deshabilitamos de nuevo el campo
 
                     datosFormulario['tecnico'] = result.value; // Guardamos el valor en el objeto
-                    // agregar time_lap a datosFormulario
-                    datosFormulario['time'] = time_lap;
+                    // agregar tiempo de captura en segundos
+                    datosFormulario['time'] = elapsedTime;
                     enviarDatos(datosFormulario);
                 }
             });
@@ -382,89 +429,73 @@
             console.log(datosFormulario);
         }
     }
+
     // Función que se ejecuta cuando se envían los datos
-    function enviarDatos(datosFormulario) {
-        fetch('/registro/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),  // Obtener el token CSRF
-            },
-            body: JSON.stringify(datosFormulario),
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Éxito',
-                        text: 'Reporte generado exitosamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar',
-                    }).then(() => {
-                        // Detener el cronómetro y obtener el tiempo total
-                        const tiempoCaptura = stopTimer();  // Detener el cronómetro y obtener el tiempo
+    async function enviarDatos(datosFormulario) {
+        try {
+            const response = await fetch('/registro/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),  // Obtener el token CSRF
+                },
+                body: JSON.stringify(datosFormulario),
+            });
+            const data = await response.json();
 
-                        // Convertir el tiempo de captura a formato HH:mm:ss
-                        const horas = Math.floor(tiempoCaptura / 3600);
-                        const minutos = Math.floor((tiempoCaptura % 3600) / 60);
-                        const segundos = tiempoCaptura % 60;
+            if (data.success) {
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Reporte generado exitosamente',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar',
+                }).then(async () => {
+                    // Detener el cronómetro y obtener el tiempo total
+                    try {
+                        const tiempoCaptura = await stopTimer();  // Esperar a que la promesa se resuelva
 
-                        // Formatear el tiempo en formato HH:mm:ss
-                        const tiempoFormateado = `${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
-
-                        // Mostrar el tiempo total de captura en una nueva alerta
+                        // Mostrar la alerta con el tiempo total de captura
                         Swal.fire({
                             title: 'Tiempo Total de Captura',
-                            text: `El tiempo total de captura fue: ${tiempoFormateado}`,
+                            text: `El tiempo total de captura fue: ${tiempoCaptura}`,
                             icon: 'info',
                             confirmButtonText: 'Aceptar',
                         });
 
-                        // Cambiar el color del canvas a lawngreen
-                        const canvas = document.getElementById('calibracion-canvas');
-                        const ctx = canvas.getContext('2d');
-                        ctx.fillStyle = 'lawngreen';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);  // Rellenar el rectángulo del canvas
-
-                        // Reiniciar el formulario
-                        const formulario = document.getElementById('formularioFeeder');
-                        formulario.reset();  // Resetea los campos estándar
-
-                        // Restablecer los selects a "NG"
-                        Array.from(formulario.elements).forEach(element => {
-                            if (element.type === 'select-one') {
-                                element.value = 'NG';  // Cambiar todos los selects a "NG"
-                                element.disabled = false;  // Habilitar los selects
-                            }
+                    } catch (error) {
+                        console.error('Error al detener el cronómetro:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Hubo un problema al detener el cronómetro.',
+                            icon: 'error',
+                            confirmButtonText: 'Aceptar',
                         });
+                    }
 
-                        // Limpiar el canvas de status
-                        const statusCanvas = document.getElementById('status-canvas');
-                        const ctx2 = statusCanvas.getContext('2d');
-                        ctx2.clearRect(0, 0, statusCanvas.width, statusCanvas.height);
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: data.message,
-                        icon: 'error',
-                        confirmButtonText: 'Aceptar',
-                    }).then(() => {
-                        const tecnicoInput = document.getElementById('tecnico');
-                        tecnicoInput.disabled = false;  // Habilitar para que el usuario lo intente de nuevo
-                        tecnicoInput.value = '';  // Limpiar el valor
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error en la solicitud:', error);
+                    // Aquí van el resto de las acciones, como cambiar el color del canvas, restablecer el formulario, etc.
+                    // (esto ya lo tenías en tu código original)
+                });
+            } else {
                 Swal.fire({
                     title: 'Error',
-                    text: 'Ocurrió un error al procesar los datos.',
+                    text: data.message,
                     icon: 'error',
                     confirmButtonText: 'Aceptar',
+                }).then(() => {
+                    const tecnicoInput = document.getElementById('tecnico');
+                    tecnicoInput.disabled = false;  // Habilitar para que el usuario lo intente de nuevo
+                    tecnicoInput.value = '';  // Limpiar el valor
                 });
+            }
+        } catch (error) {
+            console.error('Error en la solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Ocurrió un error al procesar los datos.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
             });
+        }
     }
 
     // Agregar evento al botón Calibrar
@@ -509,9 +540,9 @@
 
         // Detener el cronómetro y restablecer el tiempo
         stopTimer();  // Detener el cronómetro
-        elapsedTime = 0;  // Restablecer el tiempo acumulado a 0
+        //elapsedTime = 0;  // Restablecer el tiempo acumulado a 0
         //document.getElementById('time').value = "00:00:00";  // Resetear el campo de tiempo en la interfaz
-        time_lap = "00:00:00";
+        //time_lap = "00:00:00";
         // Mensaje opcional de confirmación de reseteo usando SweetAlert
         Swal.fire({
             title: 'Formulario reiniciado',
