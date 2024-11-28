@@ -109,10 +109,10 @@
 }
 
 .day.current-week {
-    background-color: #0872b9; /* Café */
+    background-color: #f871ed; /* Café */
 }
 
 .day.next-week {
-    background-color: #32CD32; /* Verde lima */
+    background-color: #35acdc; /* Verde lima */
 }
 

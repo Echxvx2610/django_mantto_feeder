@@ -18,7 +18,7 @@ def consultar(request):
             return JsonResponse({"error": "ID no proporcionado."}, status=400)
 
         try:
-            feeder_id = str(feeder_id)  # Convertimos a entero
+            feeder_id = int(feeder_id)  # Convertimos a entero
             #print(feeder_id,type(feeder_id))
             
             #obteniene un diccionario de search_id
@@ -117,6 +117,9 @@ def detener_cronometro(request, cronometro_id):
             return JsonResponse({'success': False, 'error': f'Error al detener el cronómetro: {str(e)}'}, status=500)
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
+def tiempo_a_segundos(tiempo_str):
+    h, m, s = map(int, tiempo_str.split(':'))
+    return h * 3600 + m * 60 + s
 
 def registro(request):
     if request.method == 'POST':
@@ -125,15 +128,16 @@ def registro(request):
             data = json.loads(request.body)
             print("Datos del JSON:", data)
             
-            feeder_id = str(data.get('id-feeder'))
+            feeder_id = int(data.get('id-feeder'))
             feeder_name = data.get('feeder')
             feeder_code = data.get('codigo-feeder')
             color_feeder = data.get('color-feeder')
             color_semana = data.get('color-semana')
             tecnico = data.get('tecnico')
-            tiempo_captura = int(data.get('tiempo_captura'))
+            # convertir el tiempo de captura a segundos
+            tiempo_captura = tiempo_a_segundos(data.get('tiempo_captura'))
             observaciones = data.get('observaciones')
-            tiempo = data.get('time')
+            tiempo = data.get('tiempo_captura')
             
             # fecha para plantilla
             fecha_actual = datetime.now()

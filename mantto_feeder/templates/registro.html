@@ -341,7 +341,7 @@
     });
 
     // Función para recolectar los datos del formulario
-    function recolectarDatosFormulario(event) {
+    async function recolectarDatosFormulario(event) {
         event.preventDefault();  // Evita que el formulario se envíe automáticamente
         const formulario = document.getElementById('formularioFeeder');
 
@@ -367,8 +367,14 @@
             }
         });
 
-        // Incluir el tiempo de captura (en segundos) en el objeto de datos
-        datosFormulario['tiempo_captura'] = elapsedTime; // El tiempo transcurrido en segundos
+        // Antes de enviar los datos, actualizamos elapsedTime
+        try {
+            elapsedTime = await stopTimer();  // Aquí obtenemos el tiempo correcto de stopTimer()
+            console.log("Tiempo de captura antes de enviar:", elapsedTime);
+            datosFormulario['tiempo_captura'] = elapsedTime;  // Actualizamos el tiempo en los datos del formulario
+        } catch (error) {
+            console.error('Error al detener el cronómetro:', error);
+        }
 
         if (camposVacios.length > 0 || !datosFormulario['data'] || datosFormulario['data'].trim() === '') {
             let mensajeError = 'Por favor, completa todos los campos obligatorios.';
@@ -418,9 +424,8 @@
                     tecnicoInput.disabled = true; // Deshabilitamos de nuevo el campo
 
                     datosFormulario['tecnico'] = result.value; // Guardamos el valor en el objeto
-                    // agregar tiempo de captura en segundos
-                    datosFormulario['time'] = elapsedTime;
                     enviarDatos(datosFormulario);
+                    console.log(datosFormulario);
                 }
             });
         } else {
@@ -471,9 +476,6 @@
                             confirmButtonText: 'Aceptar',
                         });
                     }
-
-                    // Aquí van el resto de las acciones, como cambiar el color del canvas, restablecer el formulario, etc.
-                    // (esto ya lo tenías en tu código original)
                 });
             } else {
                 Swal.fire({
