@@ -147,6 +147,7 @@
     let timerInterval;    // Intervalo para el cronómetro
     let isTimerRunning = false;  // Indicador de si el cronómetro está corriendo
 
+    // Función para iniciar el cronómetro
     function startTimer(feederId) {
         if (isTimerRunning) return;
 
@@ -340,7 +341,6 @@
         select.addEventListener('change', handleSelectChange);
     });
 
-    // Función para recolectar los datos del formulario
     async function recolectarDatosFormulario(event) {
         event.preventDefault();  // Evita que el formulario se envíe automáticamente
         const formulario = document.getElementById('formularioFeeder');
@@ -367,15 +367,7 @@
             }
         });
 
-        // Antes de enviar los datos, actualizamos elapsedTime
-        try {
-            elapsedTime = await stopTimer();  // Aquí obtenemos el tiempo correcto de stopTimer()
-            console.log("Tiempo de captura antes de enviar:", elapsedTime);
-            datosFormulario['tiempo_captura'] = elapsedTime;  // Actualizamos el tiempo en los datos del formulario
-        } catch (error) {
-            console.error('Error al detener el cronómetro:', error);
-        }
-
+        // Verificar campos vacíos antes de continuar
         if (camposVacios.length > 0 || !datosFormulario['data'] || datosFormulario['data'].trim() === '') {
             let mensajeError = 'Por favor, completa todos los campos obligatorios.';
             if (camposVacios.length > 0) {
@@ -390,6 +382,7 @@
             return;
         }
 
+        // Verificar si al menos un "feeder" es "OK"
         if (todosNG) {
             Swal.fire({
                 title: 'Error',
@@ -402,6 +395,7 @@
 
         const tecnicoInput = document.getElementById('tecnico');
 
+        // Solo pedir el número de técnico si el campo está vacío
         if (!datosFormulario['tecnico'] || datosFormulario['tecnico'].trim() === '') {
             // Habilitamos el campo técnico para que el usuario lo complete
             tecnicoInput.disabled = false;
@@ -417,98 +411,48 @@
                         return 'El número de empleado no puede tener más de 7 dígitos.';
                     }
                 }
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
                     // Asignamos el valor al campo técnico
                     tecnicoInput.value = result.value;
                     tecnicoInput.disabled = true; // Deshabilitamos de nuevo el campo
 
-                    datosFormulario['tecnico'] = result.value; // Guardamos el valor en el objeto
-                    enviarDatos(datosFormulario);
-                    console.log(datosFormulario);
+                    // Actualizamos los datos del formulario con el técnico
+                    datosFormulario['tecnico'] = result.value;
+
+                    // Detener el cronómetro solo si el formulario se va a enviar
+                    try {
+                        elapsedTime = await stopTimer();  // Detener el cronómetro solo si se confirma el técnico
+                        console.log("Tiempo de captura antes de enviar:", elapsedTime);
+                        datosFormulario['tiempo_captura'] = elapsedTime;  // Guardamos el tiempo
+                        // Enviar los datos
+                        await enviarDatos(datosFormulario, elapsedTime);
+                        limpiarFormulario(); // Limpiar formulario después del envío
+                    } catch (error) {
+                        console.error('Error al detener el cronómetro:', error);
+                    }
+                } else {
+                    // Si el usuario cancela, no detenemos el cronómetro ni registramos el tiempo
+                    console.log("El usuario canceló el ingreso del número de empleado. Cronómetro no detenido.");
                 }
             });
         } else {
-            enviarDatos(datosFormulario);
-            // imprimimos en la consola el objeto de datos
-            console.log(datosFormulario);
-        }
-    }
-
-    // Función que se ejecuta cuando se envían los datos
-    async function enviarDatos(datosFormulario) {
-        try {
-            const response = await fetch('/registro/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),  // Obtener el token CSRF
-                },
-                body: JSON.stringify(datosFormulario),
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                Swal.fire({
-                    title: 'Éxito',
-                    text: 'Reporte generado exitosamente',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar',
-                }).then(async () => {
-                    // Detener el cronómetro y obtener el tiempo total
-                    try {
-                        const tiempoCaptura = await stopTimer();  // Esperar a que la promesa se resuelva
-
-                        // Mostrar la alerta con el tiempo total de captura
-                        Swal.fire({
-                            title: 'Tiempo Total de Captura',
-                            text: `El tiempo total de captura fue: ${tiempoCaptura}`,
-                            icon: 'info',
-                            confirmButtonText: 'Aceptar',
-                        });
-
-                    } catch (error) {
-                        console.error('Error al detener el cronómetro:', error);
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Hubo un problema al detener el cronómetro.',
-                            icon: 'error',
-                            confirmButtonText: 'Aceptar',
-                        });
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: 'Error',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar',
-                }).then(() => {
-                    const tecnicoInput = document.getElementById('tecnico');
-                    tecnicoInput.disabled = false;  // Habilitar para que el usuario lo intente de nuevo
-                    tecnicoInput.value = '';  // Limpiar el valor
-                });
+            // Si el campo de técnico ya tiene valor, simplemente enviamos el formulario
+            try {
+                elapsedTime = await stopTimer();  // Detener el cronómetro solo si el formulario va a ser enviado
+                console.log("Tiempo de captura antes de enviar:", elapsedTime);
+                datosFormulario['tiempo_captura'] = elapsedTime;  // Guardamos el tiempo
+                await enviarDatos(datosFormulario, elapsedTime);
+                limpiarFormulario(); // Limpiar formulario después del envío
+            } catch (error) {
+                console.error('Error al detener el cronómetro:', error);
             }
-        } catch (error) {
-            console.error('Error en la solicitud:', error);
-            Swal.fire({
-                title: 'Error',
-                text: 'Ocurrió un error al procesar los datos.',
-                icon: 'error',
-                confirmButtonText: 'Aceptar',
-            });
         }
     }
 
-    // Agregar evento al botón Calibrar
-    document.getElementById('calibrar-btn').addEventListener('click', recolectarDatosFormulario);
-
-    // Agregar evento al botón Reset
-    document.getElementById('reset-btn').addEventListener('click', function (event) {
-        event.preventDefault();  // Evita el comportamiento de reinicio por defecto
-
+    // Función para limpiar el formulario
+    function limpiarFormulario() {
         const formulario = document.getElementById('formularioFeeder');
-
         if (!formulario) {
             console.error("Formulario no encontrado. Verifica que el ID sea correcto.");
             return;
@@ -540,19 +484,74 @@
             ctx.clearRect(0, 0, canvasCalibracion.width, canvasCalibracion.height);  // Limpia el canvas
         }
 
-        // Detener el cronómetro y restablecer el tiempo
-        stopTimer();  // Detener el cronómetro
-        //elapsedTime = 0;  // Restablecer el tiempo acumulado a 0
-        //document.getElementById('time').value = "00:00:00";  // Resetear el campo de tiempo en la interfaz
-        //time_lap = "00:00:00";
         // Mensaje opcional de confirmación de reseteo usando SweetAlert
         Swal.fire({
             title: 'Formulario reiniciado',
-            text: 'Todos los campos se han restablecido y el cronómetro ha sido detenido.',
+            text: 'Todos los campos se han restablecido.',
             icon: 'success',
             confirmButtonText: 'Aceptar',
         });
+    }
+
+    // Función que se ejecuta cuando se envían los datos
+    async function enviarDatos(datosFormulario, tiempo_captura) {
+        try {
+            const response = await fetch('/registro/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),  // Obtener el token CSRF
+                },
+                body: JSON.stringify(datosFormulario),
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Reporte generado exitosamente',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar',
+                }).then(async () => {
+                    // obtener el tiempo total
+                    Swal.fire({
+                        title: 'Tiempo Total de Captura',
+                        text: `El tiempo total de captura fue: ${tiempo_captura}`,
+                        icon: 'info',
+                        confirmButtonText: 'Aceptar',
+                    });
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar',
+                }).then(() => {
+                    const tecnicoInput = document.getElementById('tecnico');
+                    tecnicoInput.disabled = false;  // Habilitar para que el usuario lo intente de nuevo
+                    tecnicoInput.value = '';  // Limpiar el valor
+                });
+            }
+        } catch (error) {
+            console.error('Error en la solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Ocurrió un error al procesar los datos.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar',
+            });
+        }
+    }
+    // Agregar evento al botón Calibrar
+    document.getElementById('calibrar-btn').addEventListener('click', recolectarDatosFormulario);
+
+    // Agregar evento al botón Reset
+    document.getElementById('reset-btn').addEventListener('click', function (event) {
+        event.preventDefault();  // Evita el comportamiento de reinicio por defecto
+        limpiarFormulario();  // Llamamos a la función para limpiar el formulario
     });
+
 
 </script>
 {% endblock %}
