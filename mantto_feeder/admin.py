@@ -3,13 +3,13 @@ from .models import FeederRegistro,Cronometro
 
 class FeederRegistroAdmin(admin.ModelAdmin):
     # Campos que se mostrarán en la lista del admin
-    list_display = ('feeder_id', 'feeder_name', 'feeder_code', 'color_feeder', 'color_semana', 'tecnico', 'tiempo_captura', 'fecha_mantenimiento', 'created_at')
+    list_display = ('feeder_id', 'feeder_name', 'feeder_code', 'color_feeder', 'color_semana', 'tecnico', 'tiempo_captura', 'fecha_mantenimiento', 'fecha_creacion')
     
     # Campos por los que se puede buscar en el admin
     search_fields = ('feeder_id', 'feeder_name', 'feeder_code', 'color_feeder', 'color_semana', 'tecnico', 'fecha_mantenimiento')
 
     # Filtros laterales (barra lateral)
-    list_filter = ('fecha_mantenimiento', 'created_at', 'CP', 'QP', 'HOVER', 'BFC')
+    list_filter = ('fecha_mantenimiento', 'fecha_creacion', 'CP', 'QP', 'HOVER', 'BFC')
 
     # Filtro personalizado para "fecha_mantenimiento"
     class FechaMantenimientoFilter(admin.SimpleListFilter):
@@ -38,7 +38,7 @@ class FeederRegistroAdmin(admin.ModelAdmin):
             return queryset
 
     # Registra el filtro personalizado
-    list_filter = ('fecha_mantenimiento', 'created_at', 'CP', 'QP', 'HOVER', 'BFC', FechaMantenimientoFilter)
+    list_filter = ('fecha_mantenimiento', 'fecha_creacion', 'CP', 'QP', 'HOVER', 'BFC', FechaMantenimientoFilter)
 
 # Registra el modelo con su clase de administración personalizada
 admin.site.register(FeederRegistro, FeederRegistroAdmin)

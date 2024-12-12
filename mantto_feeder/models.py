@@ -23,7 +23,7 @@ class FeederRegistro(models.Model):
     fecha_mantenimiento = models.DateField(max_length=10)  # 'fecha_mantenimiento'
 
     # Timestamp de creación
-    created_at = models.DateTimeField(auto_now_add=True) 
+    fecha_creacion = models.DateTimeField(auto_now_add=True) 
     
     def __str__(self):
         return f"Feeder {self.feeder_name} - ID {self.feeder_id}"
