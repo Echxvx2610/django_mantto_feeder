@@ -2,6 +2,9 @@ import subprocess
 import os
 import sys
 
+SHARED_ENV_DIR = "C:\\envs"  # Directorio compartido para el entorno virtual
+ENV_NAME = "env_django"
+
 def instalar_dependencias_globales():
     """
     Instala PyInstaller y Django en el entorno global.
@@ -18,28 +21,40 @@ def instalar_dependencias_globales():
 
 def crear_entorno_virtual():
     """
-    Crea un entorno virtual llamado 'env_django' y lo configura.
+    Crea un entorno virtual en un directorio compartido.
     """
     try:
-        print("Creando el entorno virtual 'env_django'...")
-        subprocess.run([sys.executable, '-m', 'venv', 'env_django'], check=True)
-        print("Entorno virtual creado correctamente.")
+        # Crear el directorio compartido si no existe
+        if not os.path.exists(SHARED_ENV_DIR):
+            print(f"Creando directorio compartido en: {SHARED_ENV_DIR}")
+            os.makedirs(SHARED_ENV_DIR)
+        
+        # Ruta completa del entorno virtual
+        env_path = os.path.join(SHARED_ENV_DIR, ENV_NAME)
+        
+        if not os.path.exists(env_path):
+            print(f"Creando el entorno virtual '{env_path}'...")
+            subprocess.run([sys.executable, '-m', 'venv', env_path], check=True)
+            print("Entorno virtual creado correctamente.")
+        else:
+            print(f"El entorno virtual '{env_path}' ya existe.")
+        return env_path
     except subprocess.CalledProcessError as e:
         print(f"Error al crear el entorno virtual: {e}")
         input("Presione Enter para salir...")
         exit(1)
 
-def instalar_dependencias_entorno_virtual():
+def instalar_dependencias_entorno_virtual(env_path):
     """
     Instala las dependencias desde requirements.txt dentro del entorno virtual.
     """
     try:
         print("Instalando dependencias en el entorno virtual...")
         # Ruta al ejecutable pip dentro del entorno virtual
-        pip_executable = os.path.join('env_django', 'Scripts', 'pip.exe') if os.name == 'nt' else os.path.join('env_django', 'bin', 'pip')
+        pip_executable = os.path.join(env_path, 'Scripts', 'pip.exe') if os.name == 'nt' else os.path.join(env_path, 'bin', 'pip')
 
         # Instalar las dependencias usando el pip del entorno virtual
-        subprocess.run([pip_executable, 'install', '-r', 'requierements.txt'], check=True)
+        subprocess.run([pip_executable, 'install', '-r', 'requirements.txt'], check=True)
         print("Dependencias instaladas correctamente en el entorno virtual.")
     except subprocess.CalledProcessError as e:
         print(f"Error al instalar dependencias en el entorno virtual: {e}")
@@ -48,8 +63,8 @@ def instalar_dependencias_entorno_virtual():
 
 def main():
     instalar_dependencias_globales()
-    crear_entorno_virtual()
-    instalar_dependencias_entorno_virtual()
+    env_path = crear_entorno_virtual()
+    instalar_dependencias_entorno_virtual(env_path)
     print("\nInstalación completada con éxito.")
     input("Presione Enter para salir...")
 

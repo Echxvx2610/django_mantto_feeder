@@ -220,7 +220,7 @@ def analisis(request):
     # Meta del Feeder (30 y 10 por defecto)
     meta_feeder = 80
     meta_usuario = 30
-    print("Registros totales:", total := len(consulta))
+    #print("Registros totales:", total := len(consulta))
     
     # Crear el diccionario para guardar tipo_feeder y su respectivo tiempo
     feeder_tipo_tiempo = {
@@ -272,7 +272,7 @@ def analisis(request):
     # Obtener la semana actual del año
     fecha_actual = date.today()
     semana_actual = fecha_actual.isocalendar()[1]
-    print("Semana actual:", semana_actual)
+    #print("Semana actual:", semana_actual)
 
     # Contar los feeders por semana del año
     feeders_por_semana = defaultdict(int)

@@ -9,7 +9,7 @@ datas = copy_metadata("django")
 
 def run_django_server():
     try:
-        env_name = "env_django"
+        env_name = "C:\\envs\\env_django"
         if os.name == 'nt':  # Windows
             activate_script = os.path.join(env_name, 'Scripts', 'activate.bat')
             command = f'call {activate_script} && python manage.py runserver'
@@ -24,6 +24,7 @@ def run_django_server():
         print(f"Error inesperado: {ex}")
     finally:
         input("Presione Enter para salir...")
+
 
 def lanzar_navegador():
     url = "http://127.0.0.1:8000"
