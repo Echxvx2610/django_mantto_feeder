@@ -109,13 +109,13 @@
 }
 
 .day.current-week {
-    background-color: #494951; /* gris */
+    background-color: #ffac98; /* gris */
     color: white;
     font-weight: bold;
 }
 
 .day.next-week {
-    background-color: #35acdc; /* azul */
+    background-color: #0ec53c; /* azul */
     color: white;
     font-weight: bold;
 }

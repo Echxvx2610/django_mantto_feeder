@@ -7,7 +7,7 @@
 {% block content %}
 <div class="my-2 analisis">
     <h2 class="titulo_principal centrar">Analisis Mantenimiento</h2>
-    <div id="semanaChart" style="width: 100%; height: 350px; margin: auto;"></div>
+    <!-- <div id="semanaChart" style="width: 100%; height: 350px; margin: auto;"></div> -->
     <div id="feederPorTecnicoSemanal" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
     <!-- Nuevo gráfico de dispersión para los tiempos de captura por tipo de feeder -->
     <div id="tiemposPorTipoFeeder" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
@@ -34,50 +34,6 @@
     var semanasConPrefijo = semanas.map(function (semana) {
         return 'WK ' + semana;
     });
-
-    // Gráfico de barras para los feeders por semana
-    var semanaOptions = {
-        series: [{
-            name: 'Feeders Registrados',
-            data: feedersPorSemana  // Usamos los datos obtenidos desde Django
-        }],
-        chart: {
-            type: 'bar',
-            height: 350
-        },
-        xaxis: {
-            categories: semanasConPrefijo  // Usamos las semanas obtenidas desde Django
-        },
-        yaxis: {
-            title: {
-                text: 'Feeders Registrados'
-            },
-            min: 0,
-            max: maxY
-        },
-        title: {
-            text: 'Feeders Registrados por Semana',
-            align: 'center'
-        },
-        annotations: {
-            yaxis: [{
-                y: meta,  // Línea de meta
-                borderColor: '#FF0000',
-                label: {
-                    borderColor: '#FF0000',
-                    style: {
-                        color: 'white',
-                        background: 'crimson'
-                    },
-                    text: 'Meta: ' + meta + ' Feeders'
-                },
-                strokeDashArray: 5  // Líneas discontinuas para mejorar la visibilidad
-            }]
-        }
-    };
-
-    var semanaChart = new ApexCharts(document.querySelector("#semanaChart"), semanaOptions);
-    semanaChart.render();
 
     // Preparar las series para el gráfico apilado
     var series = tecnicos.map(function (tecnico) {

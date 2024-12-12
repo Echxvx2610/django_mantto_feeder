@@ -50,11 +50,14 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.14.4/dist/sweetalert2.min.css
                         <a class="nav-link" href="{% url 'reportes' %}"><i class="bi bi-file-earmark-person-fill"></i> Reportes</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'inventario' %}"><i class="bi bi-box-seam-fill"></i></i> Inventario</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'about' %}"><i class="bi bi-info-circle-fill"></i> Info</a>
                     </li>
                 </ul>
                 <form class="d-flex ms-auto" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Buscar ID" aria-label="Search">
+                    <input class="form-control me-2" type="search" placeholder="Buscar feeder por ID" aria-label="Buscar">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
             </div>

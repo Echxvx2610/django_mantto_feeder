@@ -310,14 +310,22 @@ def analisis(request):
         for tecnico in tecnicos:
             feeders_por_tecnico_semanal[tecnico].append(feeders_por_semana_tecnico[semana].get(tecnico, 0))
     
-    
+    # Obtener los técnicos únicos y reemplazar IDs con nombres
+    tecnicos_nombres = {tecnico: validar.user(tecnico) or tecnico for tecnico in tecnicos}
+
+    # Preparar los datos para el gráfico apilado con nombres en lugar de IDs
+    feeders_por_tecnico_semanal_nombres = {
+        tecnicos_nombres[tecnico]: data
+        for tecnico, data in feeders_por_tecnico_semanal.items()
+    }
+
     # Pasar los datos a la plantilla
     context = {
         'feeders_por_semana': feeders_semana,
         'semanas': semanas,
         'feeders_por_tecnico': feeders_tecnico,
-        'feeders_por_tecnico_semanal': feeders_por_tecnico_semanal,
-        'tecnicos': tecnicos,
+        'feeders_por_tecnico_semanal': feeders_por_tecnico_semanal_nombres,
+        'tecnicos': list(tecnicos_nombres.values()),
         'meta_feeder': meta_feeder, 
         'meta_usuario': meta_usuario, 
         #'tiempos': tiempos,
@@ -329,6 +337,9 @@ def analisis(request):
 
 def reparaciones(request):
     return render(request, 'reparaciones.html')
+
+def inventario(request):
+    return render(request, 'inventario.html')
 
 def reportes(request):
     return render(request, 'reportes.html')

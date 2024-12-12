@@ -1,0 +1,41 @@
+{% extends "layout/base.html" %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario</title>
+
+    <!-- Bootstrap CSS -->
+    <style>
+        .construction-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .construction-image {
+            max-width: 300px;
+            margin: 20px auto;
+        }
+
+        .construction-text {
+            font-size: 24px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="construction-container">
+            <img 
+                src="{% static 'img/construction.png' %}" 
+                alt="Página en construcción" 
+                class="construction-image">
+            <p class="construction-text">¡Esta página está en construcción! 🚧</p>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
