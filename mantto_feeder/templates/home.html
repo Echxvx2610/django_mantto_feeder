@@ -5,27 +5,55 @@
 {% load static %}
 
 {% block content %}
-<!-- Contenido principal del calendario -->
-<div class="box_home">
-    <h2 class="titulo_principal centrar">Calendario de Mantenimiento</h2>
-</div>
+<!-- Contenedor principal con diseño de dos columnas -->
+<div class="main-container">
+    <!-- Columna izquierda -->
+    <div class="sidebar">
+        <h3>Alertas</h3>
+        <ul>
+            <li><strong>Próximos eventos:</strong></li>
+            <li>Mantenimiento General: 15/01/2024</li>
+            <li>Inspección de Equipos: 20/01/2024</li>
+        </ul>
+        <h3>Notas</h3>
+        <p>Asegúrese de completar los registros de mantenimiento antes del vencimiento.</p>
+    </div>
 
-<!-- Controles del calendario -->
-<div class="calendar-controls">
-    <button id="prevBtn">Anterior</button>
-    <select id="viewSelect">
-        <option value="month" selected>Mensual</option>
-        <option value="3months">Trimestral</option>
-        <option value="year">Anual</option>
-    </select>
-    <button id="nextBtn">Siguiente</button>
-</div>
+    <div>
+        <!-- Contenido principal del calendario -->
+        <div class="box_home">
+            <h2 class="titulo_principal centrar">Calendario de Mantenimiento</h2>
+        </div>
 
-<!-- Contenedor del calendario -->
-<div id="calendar" class="calendar-container"></div>
+        <!-- Controles del calendario -->
+        <div class="calendar-controls">
+            <button id="prevBtn">Anterior</button>
+            <select id="viewSelect">
+                <option value="month">Mensual</option>
+                <option value="3months" selected>Trimestral</option>
+                <option value="year">Anual</option>
+            </select>
+            <button id="nextBtn">Siguiente</button>
+        </div>
 
-<!-- Incluye el JavaScript y CSS -->
-<script src="{% static 'js/calendar.js' %}"></script>
-<link rel="stylesheet" href="{% static 'css/calendar.css' %}">
-{% endblock %}
+        <!-- Contenedor del calendario -->
+        <div id="calendar" class="calendar-container"></div>
 
+    </div>
+    <!-- Incluye el JavaScript y CSS -->
+    <script src="{% static 'js/calendar.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/calendar.css' %}">
+    <!-- Script personalizado -->
+    <script>
+        const viewSelect = document.getElementById("viewSelect");
+        const mainContainer = document.querySelector(".main-container");
+
+        viewSelect.addEventListener("change", () => {
+            if (viewSelect.value === "month") {
+                mainContainer.style.gap = "250px";
+            } else {
+                mainContainer.style.gap = "10px";
+            }
+        });
+    </script>
+    {% endblock %}

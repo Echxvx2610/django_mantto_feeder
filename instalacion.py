@@ -1,9 +1,17 @@
 import subprocess
 import os
 import sys
+import getpass  # Para obtener el nombre del usuario actual
 
-SHARED_ENV_DIR = "C:\\envs"  # Directorio compartido para el entorno virtual
-ENV_NAME = "env_django"
+# Directorio compartido para los entornos virtuales
+SHARED_ENV_DIR = "C:\\envs"
+
+def obtener_nombre_entorno_virtual():
+    """
+    Genera el nombre del entorno virtual basado en el usuario activo.
+    """
+    USERNAME = getpass.getuser()
+    return f"env_django_{USERNAME}"  # Nombre del entorno virtual para el usuario
 
 def instalar_dependencias_globales():
     """
@@ -21,17 +29,18 @@ def instalar_dependencias_globales():
 
 def crear_entorno_virtual():
     """
-    Crea un entorno virtual en un directorio compartido.
+    Crea un entorno virtual específico para el usuario actual.
     """
     try:
         # Crear el directorio compartido si no existe
         if not os.path.exists(SHARED_ENV_DIR):
             print(f"Creando directorio compartido en: {SHARED_ENV_DIR}")
             os.makedirs(SHARED_ENV_DIR)
-        
-        # Ruta completa del entorno virtual
-        env_path = os.path.join(SHARED_ENV_DIR, ENV_NAME)
-        
+
+        # Obtener el nombre y ruta del entorno virtual
+        env_name = obtener_nombre_entorno_virtual()
+        env_path = os.path.join(SHARED_ENV_DIR, env_name)
+
         if not os.path.exists(env_path):
             print(f"Creando el entorno virtual '{env_path}'...")
             subprocess.run([sys.executable, '-m', 'venv', env_path], check=True)
@@ -62,6 +71,9 @@ def instalar_dependencias_entorno_virtual(env_path):
         exit(1)
 
 def main():
+    """
+    Ejecuta el proceso completo de instalación.
+    """
     instalar_dependencias_globales()
     env_path = crear_entorno_virtual()
     instalar_dependencias_entorno_virtual(env_path)

@@ -32,9 +32,10 @@ div.botones {
 }
 
 .navbar {
-    position: top;
+    position: fixed;
     top: 0;
     left: 0;
+    padding-bottom: 200px;
     width: 100%;
     z-index: 1000; 
     background-color: #333;
@@ -53,7 +54,23 @@ div.botones {
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(53, 46, 46, 0.1);
     margin: 0 auto; /* Mantener el margen automático para centrar */
+    margin-top: 50px;
 }
+
+/* Contenedor principal */
+.main-container {
+    display: flex;
+    gap: 50px;
+    padding: 20px;
+    /* min-height: 100vh; */
+}
+
+/* Contenedor del contenido principal */
+.main-container > div:last-child {
+    flex: 1; /* Toma el espacio restante */
+    min-width: 0; /* Permite que el contenido se ajuste */
+}
+
 
 .registro{
     width: 90%;
@@ -105,36 +122,15 @@ canvas {
     gap: 10px;
 }
 
-/* Media query: Cambios en pantallas pequeñas */
-@media (max-width: 500px) {
-    .container {
-        width: 100%; /* Ocupa todo el ancho disponible */
-        min-width: 100%; /* Evita espacios vacíos en móviles */
-        padding: 15px;
+/* Media query para pantallas mayores a 1500px */
+@media (min-width: 1501px) {
+    /* Gap específico para vista mensual */
+    .main-container.single-month {
+        gap: 500px;
     }
 
-    /* Secciones apiladas verticalmente */
-    .header,
-    .info,
-    .dropdowns {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    /* Cada sección ocupa todo el ancho disponible */
-    .info .left,
-    .info .center,
-    .info .right {
-        width: 100%; 
-        margin-bottom: 10px;
-    }
-
-    /* Botones y dropdowns en vertical */
-    button {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    .dropdowns select {
-        width: 100%;
+    /* Gap por defecto para vistas trimestral y anual */
+    .main-container {
+        gap: 50px;
     }
 }

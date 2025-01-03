@@ -35,6 +35,7 @@
         return 'WK ' + semana;
     });
 
+    // 1er gráfico: Feeders Registrados por Semana
     // Preparar las series para el gráfico apilado
     var series = tecnicos.map(function (tecnico) {
         return {
@@ -104,87 +105,58 @@
     var chart = new ApexCharts(document.querySelector("#feederPorTecnicoSemanal"), options);
     chart.render();
 
-    // Obtener los tipos de feeders
-    var feederTypes = Object.keys(feederTipoTiempo);  // Tipos de feeders, como 'CP', 'QP', 'HOVER', etc.
+    // 2do gráfico: Representación dinámica de tipos de feeder por semana actual
+    // Procesar los datos para obtener totales y promedios por categoría
+    var feederTipoTiempo = {
+        BFC: [],
+        CP: [20, 26, 40, 29, 20, 9, 110, 202, 792, 105, 262, 518, 103, 301, 94, 197, 260, 100, 116, 100, 31, 185, 265, 16, 12, 25, 8, 12, 8, 10, 11, 13, 17, 275, 224, 564, 99, 168, 669, 160, 98, 10, 125, 225, 533, 304, 450, 94, 152, 101, 100, 100, 93, 456, 406, 212, 98, 101, 140, 93, 472, 103, 214, 121, 164, 178, 226, 99, 11, 1192, 67, 95, 93, 1019, 221, 273, 132, 99, 101, 100, 13, 1652, 1600, 1209, 1105, 1886, 1451, 7, 29, 440, 362],
+        Desconocido: [],
+        HOVER: [109],
+        QP: [2160, 122, 106, 9, 11, 221, 104, 1233]
+    };
 
-    // Función para convertir segundos a minutos:segundos si es mayor o igual a 60
-    function formatTime(seconds) {
-        if (seconds >= 60) {
-            var minutes = Math.floor(seconds / 60);  // Obtener los minutos
-            var remainingSeconds = seconds % 60;    // Obtener los segundos restantes
-            return minutes + ':' + (remainingSeconds < 10 ? '0' : '') + remainingSeconds + ' min';  // Formatear como "m:ss"
-        } else {
-            return seconds + ' seg';  // Mostrar como segundos si es menor a 60
-        }
-    }
-
-    // Preparar los datos para el gráfico de dispersión
-    var seriesTiempos = feederTypes.map(function (tipo) {
-        var tiempos = feederTipoTiempo[tipo];  // Los tiempos de captura para este tipo
-        // Crear puntos en el gráfico, cada punto representa un tiempo de captura de un feeder
-        var puntos = tiempos.map(function (tiempo, index) {
-            return { x: tipo + ' ' + (index + 1), y: tiempo };  // x es un ID simulado, y es el tiempo de captura
-        });
-
-        return {
-            name: tipo,
-            data: puntos
-        };
+    // Calcular los totales y promedios
+    var labels = Object.keys(feederTipoTiempo);
+    var series = labels.map(function (label) {
+        return feederTipoTiempo[label].reduce((acc, val) => acc + val, 0); // Sumar los valores de cada lista
     });
 
-    // Configuración del gráfico
-    var tiempoOptions = {
-        series: seriesTiempos,
+    var averages = labels.map(function (label) {
+        var values = feederTipoTiempo[label];
+        if (values.length === 0) {
+            return 0; // Si no hay datos, el promedio es 0
+        }
+        var totalSeconds = values.reduce((acc, val) => acc + val, 0); // Sumar los valores
+        var totalMinutes = totalSeconds / 60; // Convertir a minutos
+        return (totalMinutes / values.length).toFixed(2); // Calcular el promedio en minutos y redondear a 2 decimales
+    });
+
+    console.log("Labels:", labels);
+    console.log("Series (Totales):", series);
+    console.log("Averages (Promedios en minutos):", averages);
+
+    // Configurar el gráfico
+    var pieOptions = {
+        series: series,
+        labels: labels.map(function (label, index) {
+            return `${label} (Promedio: ${averages[index]} min)`; // Agregar el promedio al label
+        }),
         chart: {
-            type: 'scatter',
+            type: 'pie',
             height: 400
         },
-        xaxis: {
-            categories: feederTypes,
-            title: {
-                text: 'Tipo de Feeder'
-            }
-        },
-        yaxis: {
-            title: {
-                text: 'Tiempo de Captura'
-            },
-            min: 0,
-            // Ajustar al mayor tiempo de captura en todos los feeders
-            max: Math.max(...Object.values(feederTipoTiempo).flat())
-        },
         title: {
-            text: 'Tiempos de Captura por Tipo de Feeder',
+            text: 'Distribución de Feeders por Tipo (Semana Actual)',
             align: 'center'
         },
-        tooltip: {
-            x: {
-                formatter: function (value) {
-                    return 'Feeder: ' + value;  // Mostrar el ID simulado
-                }
-            },
-            y: {
-                formatter: function (value) {
-                    return formatTime(value);  // Convertir el tiempo según sea en segundos o minutos
-                }
-            }
-        },
-        markers: {
-            size: 4
-        },
-        plotOptions: {
-            scatter: {
-                marker: {
-                    size: 5
-                }
-            }
+        legend: {
+            position: 'bottom'
         }
     };
 
-    // Crear y renderizar el gráfico
-    var tiempoChart = new ApexCharts(document.querySelector("#tiemposPorTipoFeeder"), tiempoOptions);
-    tiempoChart.render();
-
+    // Renderizar el gráfico
+    var pie_chart = new ApexCharts(document.querySelector("#tiemposPorTipoFeeder"), pieOptions);
+    pie_chart.render();
 
 </script>
 {% endblock %}

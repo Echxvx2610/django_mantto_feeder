@@ -1,3 +1,19 @@
+
+/* Columna izquierda (sidebar) - Actualizar las propiedades existentes */
+.sidebar {
+    width: 300px;
+    min-width: 300px;
+    height: fit-content;
+    background-color: #f8f9fa;
+    padding: 20px;
+    margin-right: 80px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 20px;
+}
+
 .calendar-controls {
     display: flex;
     justify-content: center;
@@ -16,10 +32,12 @@
     border: none;
 }
 
+/* Ajusta el contenedor principal del calendario */
 .calendar-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    width: 100%;
 }
 
 .month {
@@ -52,7 +70,7 @@
 
 .day {
     background-color: ghostwhite;
-    padding: 5px;
+    padding: 2px;
     border: 1px solid rgb(215, 215, 221);
     aspect-ratio: 1 / 1;
     display: flex;
@@ -64,11 +82,16 @@
     color: #b94949;
 }
 
-/* Estilos para vista de un mes */
+
+/* Asegúrate de que el contenedor del mes único ocupe todo el espacio disponible */
 .calendar-container.single-month .month {
-    width: 100%;
-    max-width: 800px;
+    width: 100%; /* Ocupa el 100% del contenedor */
+    max-width: 100%; /* Elimina restricciones de ancho */
+    margin: 0 auto; /* Centra el contenedor */
+    padding: 20px; /* Ajusta el espacio interno */
+    box-sizing: border-box; /* Incluye el padding y border en el tamaño total */
 }
+
 
 /* Estilos para vista de tres meses */
 .calendar-container.three-months .month {
@@ -98,6 +121,61 @@
 @media (max-width: 600px) {
     .calendar-container.three-months .month,
     .calendar-container.year-view .month {
+        width: 100%;
+    }
+}
+
+/* Media query: Cambios en pantallas pequeñas */
+@media (max-width: 500px) {
+    .container {
+        width: 100%; /* Ocupa todo el ancho disponible */
+        min-width: 100%; /* Evita espacios vacíos en móviles */
+        padding: 15px;
+    }
+
+    /* Secciones apiladas verticalmente */
+    .header,
+    .info,
+    .dropdowns {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Cada sección ocupa todo el ancho disponible */
+    .info .left,
+    .info .center,
+    .info .right {
+        width: 100%; 
+        margin-bottom: 10px;
+    }
+
+    /* Botones y dropdowns en vertical */
+    button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .dropdowns select {
+        width: 100%;
+    }
+}
+
+/* Media query para pantallas menores a 1500px */
+@media (max-width: 1500px) {
+    .main-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        min-width: 100% !important;
+        margin-right: 0 !important;
+        margin-bottom: 40px;
+        position: relative !important;
+        top: 0 !important;
+    }
+
+    .main-container > div:last-child {
         width: 100%;
     }
 }

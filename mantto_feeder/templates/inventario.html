@@ -24,6 +24,7 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Descripción</th>
+                    <th>Stock Min</th>
                     <th>Qty</th>
                 </tr>
             </thead>
@@ -31,55 +32,75 @@
                 <tr>
                     <td>Tape Lift</td>
                     <td>Descripción para Tape Lift</td>
+                    <td>5</td>
                     <td>10</td>
                 </tr>
                 <tr>
                     <td>Tape Up Reel</td>
                     <td>Descripción para Tape Up Reel</td>
-                    <td>5</td>
+                    <td>4</td>
+                    <td>10</td>
                 </tr>
                 <tr>
                     <td>Base Feeder</td>
                     <td>Descripción para Base Feeder</td>
+                    <td>10</td>
                     <td>20</td>
                 </tr>
                 <tr>
                     <td>Sensor Proximity</td>
                     <td>Descripción para Sensor Proximity</td>
+                    <td>5</td>
                     <td>15</td>
                 </tr>
                 <tr>
                     <td>Spring</td>
                     <td>Descripción para Servo Motor</td>
+                    <td>10</td>
                     <td>8</td>
                 </tr>
                 <tr>
                     <td>Connector SMEMA</td>
                     <td>Descripción para Power Supply</td>
+                    <td>5</td>
                     <td>12</td>
                 </tr>
                 <tr>
                     <td>Electronic valve</td>
                     <td>Descripción para Control Panel</td>
+                    <td>4</td>
                     <td>7</td>
                 </tr>
                 <tr>
                     <td>Cooling Fan</td>
                     <td>Descripción para Cooling Fan</td>
+                    <td>5</td>
                     <td>18</td>
                 </tr>
                 <tr>
                     <td>Hydraulic Pump</td>
                     <td>Descripción para Hydraulic Pump</td>
+                    <td>2</td>
                     <td>4</td>
                 </tr>
                 <tr>
                     <td>Heat Sink</td>
                     <td>Descripción para Heat Sink</td>
+                    <td>5</td>
                     <td>25</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
+<script>
+    Swal.fire({
+        position: "top",
+        icon: "info",
+        title: "Alerta!",
+        text: "Se encontraron No.Parts en Stock Minimo!",
+        showConfirmButton: false,
+        timer: 1500
+    });
+</script>
 {% endblock %}

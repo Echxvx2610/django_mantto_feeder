@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextBtn = document.getElementById('nextBtn');
 
     let currentDate = new Date();
-    let currentView = 'month';
+    let currentView = '3months';
 
     function updateCalendar() {
         calendarEl.innerHTML = '';

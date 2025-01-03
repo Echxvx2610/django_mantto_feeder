@@ -175,7 +175,7 @@ def registro(request):
             
             # Crear la plantilla
             try:
-                crear_plantilla.create_template(tecnico_valido, feeder_id, tipo_feeder, fecha_mantenimiento_plantilla, color_semana, observaciones)
+                crear_plantilla.create_template(tecnico_valido, feeder_id, tipo_feeder, fecha_mantenimiento_plantilla, color_feeder, observaciones)
             except (IOError, Exception) as e:
                 return JsonResponse({'success': False, 'message': f'Error al procesar los datos: {e}'}, status=400)
             
