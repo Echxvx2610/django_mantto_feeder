@@ -12,6 +12,7 @@
     <!-- Nuevo gráfico de dispersión para los tiempos de captura por tipo de feeder -->
     <div id="tiemposPorTipoFeeder" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
 </div>
+<p>{{contexto|safe}}</p>
 
 <!-- Cargar ApexCharts desde un CDN -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -25,7 +26,16 @@
     var meta = {{ meta_feeder| safe }};
     var meta_usuario = {{ meta_usuario| safe }};
     var feederTipoTiempo = {{ feeder_tipo_tiempo| safe }};  // Nuevo contexto para los tiempos de captura por tipo de feeder
-    //console.log(feederTipoTiempo);
+    // contexto recibido por Django
+    console.log("feedersPorSemana:", feedersPorSemana);
+    console.log("feedersPorTecnicoSemanal:", feedersPorTecnicoSemanal);
+    console.log("Semanas:", semanas);
+    console.log("Feeders Tecnico:", feedersPorTecnico);
+    console.log("Tecnicos:", tecnicos);
+    console.log("Meta:", meta);
+    console.log("Meta Usuario:", meta_usuario);
+    console.log("FeederTipoTiempo:", feederTipoTiempo);
+
     // Calcular el valor de maxY para asegurarnos de que la meta sea visible
     var maxY = Math.max(...feedersPorSemana, meta) + 10; // Asegúrate de que la meta sea visible, sumando un margen de 10
     var maxY2 = Math.max(...feedersPorTecnico, meta_usuario) + 10;
@@ -34,6 +44,8 @@
     var semanasConPrefijo = semanas.map(function (semana) {
         return 'WK ' + semana;
     });
+
+    console.log("Semanas con Prefijo:", semanasConPrefijo);
 
     // 1er gráfico: Feeders Registrados por Semana
     // Preparar las series para el gráfico apilado
@@ -104,38 +116,41 @@
 
     var chart = new ApexCharts(document.querySelector("#feederPorTecnicoSemanal"), options);
     chart.render();
-
+    
     // 2do gráfico: Representación dinámica de tipos de feeder por semana actual
-    // Procesar los datos para obtener totales y promedios por categoría
-    var feederTipoTiempo = {
-        BFC: [],
-        CP: [20, 26, 40, 29, 20, 9, 110, 202, 792, 105, 262, 518, 103, 301, 94, 197, 260, 100, 116, 100, 31, 185, 265, 16, 12, 25, 8, 12, 8, 10, 11, 13, 17, 275, 224, 564, 99, 168, 669, 160, 98, 10, 125, 225, 533, 304, 450, 94, 152, 101, 100, 100, 93, 456, 406, 212, 98, 101, 140, 93, 472, 103, 214, 121, 164, 178, 226, 99, 11, 1192, 67, 95, 93, 1019, 221, 273, 132, 99, 101, 100, 13, 1652, 1600, 1209, 1105, 1886, 1451, 7, 29, 440, 362],
-        Desconocido: [],
-        HOVER: [109],
-        QP: [2160, 122, 106, 9, 11, 221, 104, 1233]
-    };
+    // Filtrar los datos de la semana actual para cada tipo de feeder
+    var semanaActual = {{ semana_actual| safe }};  // Semana actual proporcionada por Django
+    console.log("Semana Actual:", semanaActual);
 
-    // Calcular los totales y promedios
-    var labels = Object.keys(feederTipoTiempo);
+    // Filtramos los datos para la semana actual
+    var filteredFeederTipoTiempo = {};
+    Object.keys(feederTipoTiempo).forEach(function (label) {
+        var values = feederTipoTiempo[label];
+
+        // Aquí, suponemos que los valores en el array están ordenados por semana.
+        // Filtramos solo los valores correspondientes a la semana actual.
+        filteredFeederTipoTiempo[label] = values[semanaActual - 1];  // semanaActual - 1 porque los índices empiezan desde 0
+    });
+
+    // Ahora filteredFeederTipoTiempo contiene los valores solo para la semana actual.
+    console.log("FeederTipoTiempo Filtrado para la Semana Actual:", filteredFeederTipoTiempo);
+
+    // Preparamos las series y promedios para el gráfico de pastel
+    var labels = Object.keys(filteredFeederTipoTiempo);
     var series = labels.map(function (label) {
-        return feederTipoTiempo[label].reduce((acc, val) => acc + val, 0); // Sumar los valores de cada lista
+        return filteredFeederTipoTiempo[label];  // Sumar los valores de cada lista (para un solo valor, no es necesario sumarlos)
     });
 
     var averages = labels.map(function (label) {
-        var values = feederTipoTiempo[label];
-        if (values.length === 0) {
-            return 0; // Si no hay datos, el promedio es 0
-        }
-        var totalSeconds = values.reduce((acc, val) => acc + val, 0); // Sumar los valores
-        var totalMinutes = totalSeconds / 60; // Convertir a minutos
-        return (totalMinutes / values.length).toFixed(2); // Calcular el promedio en minutos y redondear a 2 decimales
+        var value = filteredFeederTipoTiempo[label];
+        return value ? (value / 60).toFixed(2) : 0;  // Convertimos a minutos y calculamos el promedio
     });
 
     console.log("Labels:", labels);
     console.log("Series (Totales):", series);
     console.log("Averages (Promedios en minutos):", averages);
 
-    // Configurar el gráfico
+    // Configurar el gráfico de pastel
     var pieOptions = {
         series: series,
         labels: labels.map(function (label, index) {
@@ -150,13 +165,13 @@
             align: 'center'
         },
         legend: {
-            position: 'bottom'
+            position: 'right',
         }
     };
 
-    // Renderizar el gráfico
+    // Renderizar el gráfico de pastel
     var pie_chart = new ApexCharts(document.querySelector("#tiemposPorTipoFeeder"), pieOptions);
     pie_chart.render();
-
+    
 </script>
 {% endblock %}

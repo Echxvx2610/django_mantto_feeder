@@ -215,7 +215,7 @@ def home(request):
 
 def analisis(request):
     # Extraer todos los registros de la base de datos
-    consulta = FeederRegistro.objects.all()[:100]
+    consulta = FeederRegistro.objects.all()
     
     # Meta del Feeder (30 y 10 por defecto)
     meta_feeder = 80
@@ -228,12 +228,11 @@ def analisis(request):
         "QP": [],
         "HOVER": [],
         "BFC": [],
-        "Desconocido": []  # Si no coincide con ningún tipo conocido
     }
 
     # Llenar el diccionario con los datos de feeder_id, tipo_feeder y tiempo_captura
     for resultado in consulta:
-        tipo = "Desconocido"  # Valor por defecto si no se encuentra un tipo válido
+        tipo = ""  # Valor por defecto si no se encuentra un tipo válido
         
         # Identificar el tipo de feeder basado en los valores de los campos
         if resultado.CP == "OK":
@@ -247,7 +246,7 @@ def analisis(request):
         
         # Añadir al diccionario el (feeder_id, tiempo_captura)
         feeder_tipo_tiempo[tipo].append((resultado.feeder_id, resultado.tiempo_captura))
-        
+        #print(feeder_tipo_tiempo)
         
     # Obtener el técnico desde la solicitud GET (si existe)
     tecnico = request.GET.get('tecnico', "00000")
@@ -276,6 +275,7 @@ def analisis(request):
 
     # Contar los feeders por semana del año
     feeders_por_semana = defaultdict(int)
+    feeders_por_semana_tipo = []
     for registro in consulta:
         semana = registro.fecha_mantenimiento.isocalendar()[1]  # Obtener la semana
         feeders_por_semana[semana] += 1
@@ -288,7 +288,6 @@ def analisis(request):
     # Prepara los datos para los gráficos
     semanas = list(feeders_por_semana.keys())
     feeders_semana = [feeders_por_semana.get(semana, 0) for semana in semanas]
-
     tecnicos = list(feeders_por_tecnico.keys())
     feeders_tecnico = [feeders_por_tecnico.get(tecnico, 0) for tecnico in tecnicos]
 
@@ -300,17 +299,18 @@ def analisis(request):
 
     # Preparar los datos para las semanas (categorías del gráfico)
     semanas = sorted(feeders_por_semana_tecnico.keys())  # Las semanas, ordenadas
+
     # Obtener los técnicos
     tecnicos = list(set(tecnico for semana in feeders_por_semana_tecnico.values() for tecnico in semana.keys())) 
-    tecnicos.sort()  # Ordenar los técnicos alfabéticamente si lo deseas
+    tecnicos.sort()  # Ordenar los técnicos alfabéticamente
 
-    # Preparar los datos para el gráfico apilado (por cada técnico, por cada semana)
+    # Preparar los datos para el grafico apilado (por cada tecnico, por cada semana)
     feeders_por_tecnico_semanal = {tecnico: [] for tecnico in tecnicos}
     for semana in semanas:
         for tecnico in tecnicos:
             feeders_por_tecnico_semanal[tecnico].append(feeders_por_semana_tecnico[semana].get(tecnico, 0))
-    
-    # Obtener los técnicos únicos y reemplazar IDs con nombres
+
+    # Obtener los tecnicos unicos y reemplazar IDs con nombres
     tecnicos_nombres = {tecnico: validar.user(tecnico) or tecnico for tecnico in tecnicos}
 
     # Preparar los datos para el gráfico apilado con nombres en lugar de IDs
@@ -319,6 +319,7 @@ def analisis(request):
         for tecnico, data in feeders_por_tecnico_semanal.items()
     }
 
+    
     # Pasar los datos a la plantilla
     context = {
         'feeders_por_semana': feeders_semana,
@@ -330,7 +331,8 @@ def analisis(request):
         'meta_usuario': meta_usuario, 
         #'tiempos': tiempos,
         #'tipo_feeder': tipo_feeder,  
-        'feeder_tipo_tiempo': feeder_tipo_tiempo
+        'feeder_tipo_tiempo': feeder_tipo_tiempo,
+        'semana_actual': semana_actual
     }
 
     return render(request, 'analisis.html', context)

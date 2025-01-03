@@ -165,10 +165,10 @@ def search_fecha(FECHA:str):
             -Index fecha: index de fecha (posicion del dato en csv)s
     '''
     #fecha en columna
-    with open(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\mantto seq.csv') as mantto_seq:#ruta oficial de documento
+    with open(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\mantto seq 2025.csv') as mantto_seq:#ruta oficial de documento
         #Crear un lector
         lectura_mantto = csv.reader(mantto_seq)
-        data_mantto = pd.read_csv(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\mantto seq.csv',encoding = "ISO-8859-1",usecols=['DIA','COLOR'],low_memory=False)#ruta oficial de documento
+        data_mantto = pd.read_csv(r'H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\mantto seq 2025.csv',encoding = "ISO-8859-1",usecols=['DIA','COLOR'],low_memory=False)#ruta oficial de documento
         df_mantto = pd.DataFrame(data_mantto)
         index_fecha = df_mantto.loc[df_mantto['DIA'] == FECHA].to_string(index = False)
         index_fecha = index_fecha.split()

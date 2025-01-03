@@ -1,0 +1,200 @@
+
+/* Columna izquierda (sidebar) - Actualizar las propiedades existentes */
+.sidebar {
+    width: 300px;
+    min-width: 300px;
+    height: fit-content;
+    background-color: #f8f9fa;
+    padding: 20px;
+    margin-right: 80px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 20px;
+}
+
+.calendar-controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.calendar-controls button,
+.calendar-controls select {
+    margin: 0 10px;
+    padding: 10px 10px;
+    background-color: #075964;
+    color : white;
+    font-weight: bold;
+    font-family: monospace;
+    border-radius: 10px;
+    border: none;
+}
+
+/* Ajusta el contenedor principal del calendario */
+.calendar-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.month {
+    margin: 10px;
+    padding: 10px;
+    border: 2px solid #0c6a70;
+    border-radius: 5px;
+    box-sizing: border-box;
+    box-shadow: #0c6a70 5px 10px;
+}
+
+.month-header {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+}
+
+.day {
+    background-color: ghostwhite;
+    padding: 2px;
+    border: 1px solid rgb(215, 215, 221);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.day.other-month {
+    color: #b94949;
+}
+
+
+/* Asegúrate de que el contenedor del mes único ocupe todo el espacio disponible */
+.calendar-container.single-month .month {
+    width: 100%; /* Ocupa el 100% del contenedor */
+    max-width: 100%; /* Elimina restricciones de ancho */
+    margin: 0 auto; /* Centra el contenedor */
+    padding: 20px; /* Ajusta el espacio interno */
+    box-sizing: border-box; /* Incluye el padding y border en el tamaño total */
+}
+
+
+/* Estilos para vista de tres meses */
+.calendar-container.three-months .month {
+    width: calc(33.33% - 20px);
+    min-width: 250px;
+}
+
+/* Estilos para vista anual */
+.calendar-container.year-view .month {
+    width: calc(25% - 20px);
+    min-width: 200px;
+}
+
+@media (max-width: 1200px) {
+    .calendar-container.year-view .month {
+        width: calc(33.33% - 20px);
+    }
+}
+
+@media (max-width: 900px) {
+    .calendar-container.three-months .month,
+    .calendar-container.year-view .month {
+        width: calc(50% - 20px);
+    }
+}
+
+@media (max-width: 600px) {
+    .calendar-container.three-months .month,
+    .calendar-container.year-view .month {
+        width: 100%;
+    }
+}
+
+/* Media query: Cambios en pantallas pequeñas */
+@media (max-width: 500px) {
+    .container {
+        width: 100%; /* Ocupa todo el ancho disponible */
+        min-width: 100%; /* Evita espacios vacíos en móviles */
+        padding: 15px;
+    }
+
+    /* Secciones apiladas verticalmente */
+    .header,
+    .info,
+    .dropdowns {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Cada sección ocupa todo el ancho disponible */
+    .info .left,
+    .info .center,
+    .info .right {
+        width: 100%; 
+        margin-bottom: 10px;
+    }
+
+    /* Botones y dropdowns en vertical */
+    button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .dropdowns select {
+        width: 100%;
+    }
+}
+
+/* Media query para pantallas menores a 1500px */
+@media (max-width: 1500px) {
+    .main-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        min-width: 100% !important;
+        margin-right: 0 !important;
+        margin-bottom: 40px;
+        position: relative !important;
+        top: 0 !important;
+    }
+
+    .main-container > div:last-child {
+        width: 100%;
+    }
+}
+
+.day.today {
+    background-color: crimson;
+    color: white;
+    font-weight: bold;
+}
+
+.day.current-week {
+    background-color: #ffac98; /* gris */
+    color: white;
+    font-weight: bold;
+}
+
+.day.next-week {
+    background-color: #0ec53c; /* azul */
+    color: white;
+    font-weight: bold;
+}
+
