@@ -298,7 +298,7 @@ def analisis(request):
         feeders_por_semana_tecnico[semana][registro.tecnico] += 1
 
     # Preparar los datos para las semanas (categorías del gráfico)
-    semanas = sorted(feeders_por_semana_tecnico.keys())  # Las semanas, ordenadas
+    #semanas = sorted(feeders_por_semana_tecnico.keys())  # Las semanas, ordenadas
 
     # Obtener los técnicos
     tecnicos = list(set(tecnico for semana in feeders_por_semana_tecnico.values() for tecnico in semana.keys())) 

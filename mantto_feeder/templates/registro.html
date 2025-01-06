@@ -507,19 +507,20 @@
             const data = await response.json();
 
             if (data.success) {
-                Swal.fire({
+                // Mostrar alerta de éxito de reporte generado
+                await Swal.fire({
                     title: 'Éxito',
                     text: 'Reporte generado exitosamente',
                     icon: 'success',
                     confirmButtonText: 'Aceptar',
-                }).then(async () => {
-                    // obtener el tiempo total
-                    Swal.fire({
-                        title: 'Tiempo Total de Captura',
-                        text: `El tiempo total de captura fue: ${tiempo_captura}`,
-                        icon: 'info',
-                        confirmButtonText: 'Aceptar',
-                    });
+                });
+
+                // Después de que la primera alerta se cierra, mostrar la de tiempo de captura
+                await Swal.fire({
+                    title: 'Tiempo Total de Captura',
+                    text: `El tiempo total de captura fue: ${tiempo_captura}`,
+                    icon: 'info',
+                    confirmButtonText: 'Aceptar',
                 });
             } else {
                 Swal.fire({
@@ -543,6 +544,7 @@
             });
         }
     }
+
     // Agregar evento al botón Calibrar
     document.getElementById('calibrar-btn').addEventListener('click', recolectarDatosFormulario);
 
