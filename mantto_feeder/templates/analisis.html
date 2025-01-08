@@ -116,39 +116,26 @@
 
     var chart = new ApexCharts(document.querySelector("#feederPorTecnicoSemanal"), options);
     chart.render();
-    
+
     // 2do gráfico: Representación dinámica de tipos de feeder por semana actual
-    // Filtrar los datos de la semana actual para cada tipo de feeder
+    // Datos pasados desde Django
+    var feederTipoTiempo = {{ feeder_tipo_tiempo| safe }};  // El objeto con los tiempos de captura por tipo de feeder
     var semanaActual = {{ semana_actual| safe }};  // Semana actual proporcionada por Django
-    console.log("Semana Actual:", semanaActual);
 
-    // Filtramos los datos para la semana actual
-    var filteredFeederTipoTiempo = {};
-    Object.keys(feederTipoTiempo).forEach(function (label) {
-        var values = feederTipoTiempo[label];
+    // Filtrar y procesar los datos para cada tipo de feeder
+    var labels = Object.keys(feederTipoTiempo);
+    var series = [];
+    var averages = [];
 
-        // Aquí, suponemos que los valores en el array están ordenados por semana.
-        // Filtramos solo los valores correspondientes a la semana actual.
-        filteredFeederTipoTiempo[label] = values[semanaActual - 1];  // semanaActual - 1 porque los índices empiezan desde 0
+    labels.forEach(function (label) {
+        var values = feederTipoTiempo[label];  // Array de tiempos de captura para cada tipo de feeder
+        var totalTime = values.reduce((a, b) => a + b, 0);  // Sumatoria de los tiempos
+        var averageTime = values.length > 0 ? totalTime / values.length : 0;  // Promedio (en segundos)
+
+        // Usar la sumatoria o el promedio (dependiendo de lo que prefieras mostrar)
+        series.push(totalTime);  // Para mostrar la sumatoria en el gráfico
+        averages.push((averageTime / 60).toFixed(2));  // Convertir a minutos y redondear a 2 decimales
     });
-
-    // Ahora filteredFeederTipoTiempo contiene los valores solo para la semana actual.
-    console.log("FeederTipoTiempo Filtrado para la Semana Actual:", filteredFeederTipoTiempo);
-
-    // Preparamos las series y promedios para el gráfico de pastel
-    var labels = Object.keys(filteredFeederTipoTiempo);
-    var series = labels.map(function (label) {
-        return filteredFeederTipoTiempo[label];  // Sumar los valores de cada lista (para un solo valor, no es necesario sumarlos)
-    });
-
-    var averages = labels.map(function (label) {
-        var value = filteredFeederTipoTiempo[label];
-        return value ? (value / 60).toFixed(2) : 0;  // Convertimos a minutos y calculamos el promedio
-    });
-
-    console.log("Labels:", labels);
-    console.log("Series (Totales):", series);
-    console.log("Averages (Promedios en minutos):", averages);
 
     // Configurar el gráfico de pastel
     var pieOptions = {
@@ -158,7 +145,7 @@
         }),
         chart: {
             type: 'pie',
-            height: 400
+            height: 550
         },
         title: {
             text: 'Distribución de Feeders por Tipo (Semana Actual)',
@@ -172,6 +159,6 @@
     // Renderizar el gráfico de pastel
     var pie_chart = new ApexCharts(document.querySelector("#tiemposPorTipoFeeder"), pieOptions);
     pie_chart.render();
-    
+
 </script>
 {% endblock %}

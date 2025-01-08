@@ -1,6 +1,8 @@
+import json
+import pandas as pd
+import csv
 from django.shortcuts import render, redirect
 from django.http import HttpResponse,JsonResponse
-import json
 from .tools import crear_plantilla,search_feeder,validar
 from collections import defaultdict
 from .models import FeederRegistro,Cronometro
@@ -211,16 +213,43 @@ def registro(request):
 
 
 def home(request):
-    return render(request, 'home.html')
+    data = pd.read_csv(r"H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\mantto seq 2025.csv" ,encoding = "ISO-8859-1",usecols=['DIA','COLOR'],engine='python')
+    ''' 
+    Ejemplo de salida:
+                DIA        COLOR
+    0           NaN          NaN
+    1      1/1/2025          NaN
+    2      1/2/2025          NaN
+    3      1/3/2025          NaN
+    4      1/4/2025          NaN
+    5      1/5/2025          NaN
+    6      1/6/2025         AZUL
+    7      1/7/2025         AZUL
+    8      1/8/2025         AZUL
+    9      1/9/2025         AZUL
+    10    1/10/2025        VERDE
+    11    1/11/2025          NaN
+    12    1/12/2025          NaN
+    13    1/13/2025        VERDE
+    14    1/14/2025        VERDE
+    15    1/15/2025        VERDE
+    '''
+    context = {
+        'fecha_color': data
+    }
+    return render(request,'home.html',context)
 
 def analisis(request):
     # Extraer todos los registros de la base de datos
     consulta = FeederRegistro.objects.all()
     
-    # Meta del Feeder (30 y 10 por defecto)
+    # Obtener la semana actual del año
+    fecha_actual = date.today()
+    semana_actual = fecha_actual.isocalendar()[1]
+    
+    # Meta del Feeder
     meta_feeder = 80
     meta_usuario = 30
-    #print("Registros totales:", total := len(consulta))
     
     # Crear el diccionario para guardar tipo_feeder y su respectivo tiempo
     feeder_tipo_tiempo = {
@@ -230,9 +259,18 @@ def analisis(request):
         "BFC": [],
     }
 
+    feeder_tipo_tiempo_semana_actual = {
+        "CP": [],
+        "QP": [],
+        "HOVER": [],
+        "BFC": [],
+    }
+
     # Llenar el diccionario con los datos de feeder_id, tipo_feeder y tiempo_captura
     for resultado in consulta:
         tipo = ""  # Valor por defecto si no se encuentra un tipo válido
+        fecha_mantenimiento = resultado.fecha_mantenimiento
+        semana_mantenimiento = fecha_mantenimiento.isocalendar()[1]  # Semana de la fecha de mantenimiento
         
         # Identificar el tipo de feeder basado en los valores de los campos
         if resultado.CP == "OK":
@@ -243,11 +281,21 @@ def analisis(request):
             tipo = "HOVER"
         elif resultado.BFC == "OK":
             tipo = "BFC"
-        
-        # Añadir al diccionario el (feeder_id, tiempo_captura)
-        feeder_tipo_tiempo[tipo].append((resultado.feeder_id, resultado.tiempo_captura))
-        #print(feeder_tipo_tiempo)
-        
+
+        # Añadir al diccionario el (feeder_id, tiempo_captura) solo si la semana de mantenimiento es la actual
+        if semana_mantenimiento == semana_actual:
+            feeder_tipo_tiempo[tipo].append((resultado.feeder_id, resultado.tiempo_captura))
+            feeder_tipo_tiempo_semana_actual[tipo].append((resultado.feeder_id, resultado.tiempo_captura, resultado.fecha_mantenimiento))
+    
+    # Sumatoria de tiempo para los tipos de feeder en la semana actual
+    sumatoria_tipo_semana_actual = {}
+    for tipo in ["CP", "QP", "HOVER", "BFC"]:
+        # Calcular la suma de tiempos para cada tipo de feeder solo para la semana actual
+        sumatoria_tipo_semana_actual[tipo] = sum(tiempo_captura for _, tiempo_captura, _ in feeder_tipo_tiempo_semana_actual[tipo])
+    
+    # Imprimir la sumatoria de cada tipo de feeder para la semana actual
+    #print(sumatoria_tipo_semana_actual)
+
     # Obtener el técnico desde la solicitud GET (si existe)
     tecnico = request.GET.get('tecnico', "00000")
     
@@ -267,15 +315,9 @@ def analisis(request):
         for registro in consulta:
             pass
             #print(f"Feeder ID: {registro.feeder_id}, Técnico: {registro.tecnico}")
-    
-    # Obtener la semana actual del año
-    fecha_actual = date.today()
-    semana_actual = fecha_actual.isocalendar()[1]
-    #print("Semana actual:", semana_actual)
 
     # Contar los feeders por semana del año
     feeders_por_semana = defaultdict(int)
-    feeders_por_semana_tipo = []
     for registro in consulta:
         semana = registro.fecha_mantenimiento.isocalendar()[1]  # Obtener la semana
         feeders_por_semana[semana] += 1
@@ -298,11 +340,11 @@ def analisis(request):
         feeders_por_semana_tecnico[semana][registro.tecnico] += 1
 
     # Preparar los datos para las semanas (categorías del gráfico)
-    #semanas = sorted(feeders_por_semana_tecnico.keys())  # Las semanas, ordenadas
+    #semanas = sorted(feeders_por_semana_tecnico.keys())  # semanas ordenadas
 
-    # Obtener los técnicos
+    # Obtener los tecnicos
     tecnicos = list(set(tecnico for semana in feeders_por_semana_tecnico.values() for tecnico in semana.keys())) 
-    tecnicos.sort()  # Ordenar los técnicos alfabéticamente
+    tecnicos.sort()  # Ordenar los tecnicos alfabéticamente
 
     # Preparar los datos para el grafico apilado (por cada tecnico, por cada semana)
     feeders_por_tecnico_semanal = {tecnico: [] for tecnico in tecnicos}
@@ -318,7 +360,6 @@ def analisis(request):
         tecnicos_nombres[tecnico]: data
         for tecnico, data in feeders_por_tecnico_semanal.items()
     }
-
     
     # Pasar los datos a la plantilla
     context = {
@@ -332,6 +373,7 @@ def analisis(request):
         #'tiempos': tiempos,
         #'tipo_feeder': tipo_feeder,  
         'feeder_tipo_tiempo': feeder_tipo_tiempo,
+        'sumatoria_tipo_semana_actual': sumatoria_tipo_semana_actual,
         'semana_actual': semana_actual
     }
 

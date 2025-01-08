@@ -162,7 +162,7 @@
 /* Media query para pantallas menores a 1500px */
 @media (max-width: 1500px) {
     .main-container {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
     }
 

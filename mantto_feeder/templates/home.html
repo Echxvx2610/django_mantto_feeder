@@ -9,18 +9,18 @@
 <div class="main-container">
     <!-- Columna izquierda -->
     <div class="sidebar">
-        <h3>Alertas<i class="bi bi-exclamation-lg"></i></h3>
+        <h3>Alertas<i class="bi bi-exclamation-lg" title="Alertas"></i></h3>
         <ul>
             <li><strong>Próximos eventos:</strong></li>
             <li>Mantenimiento General: 15/01/2024</li>
             <li>Inspección de Equipos: 20/01/2024</li>
         </ul>
-        <h3>Notas <i class="bi bi-pencil-square" id="editNoteIcon" style="cursor: pointer;"></i></h3>
+        <h3>Notas <i class="bi bi-pencil-square" id="editNoteIcon" style="cursor: pointer;" title="Agregar Nota"></i></h3>
         <div id="notesContainer">
             <!-- Aquí se mostrarán las notas -->
         </div>
         <div id="noteFormContainer" style="display: none;">
-            <textarea id="noteInput" placeholder="Escribe una nueva nota..."></textarea>
+            <textarea id="noteInput" placeholder="Escribe una nueva nota..." style="width: 100%;"></textarea>
             <button id="saveNoteBtn">Guardar Nota</button>
             <button id="cancelNoteBtn">Cancelar</button>
         </div>
