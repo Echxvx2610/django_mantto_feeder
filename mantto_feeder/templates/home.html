@@ -15,7 +15,8 @@
             <li>Mantenimiento General: 15/01/2024</li>
             <li>Inspección de Equipos: 20/01/2024</li>
         </ul>
-        <h3>Notas <i class="bi bi-pencil-square" id="editNoteIcon" style="cursor: pointer;" title="Agregar Nota"></i></h3>
+        <h3>Notas <i class="bi bi-pencil-square" id="editNoteIcon" style="cursor: pointer;" title="Agregar Nota"></i>
+        </h3>
         <div id="notesContainer">
             <!-- Aquí se mostrarán las notas -->
         </div>
@@ -34,13 +35,14 @@
 
         <!-- Controles del calendario -->
         <div class="calendar-controls">
-            <button id="prevBtn"><< </button>
-            <select id="viewSelect">
-                <option value="month">Mensual</option>
-                <option value="3months" selected>Trimestral</option>
-                <option value="year">Anual</option>
-            </select>
-            <button id="nextBtn"> >></button>
+            <button id="prevBtn">
+                << </button>
+                    <select id="viewSelect">
+                        <option value="month">Mensual</option>
+                        <option value="3months" selected>Trimestral</option>
+                        <option value="year">Anual</option>
+                    </select>
+                    <button id="nextBtn"> >></button>
         </div>
 
         <!-- Contenedor del calendario -->
@@ -53,6 +55,7 @@
 
     <!-- Script personalizado para sidebar-->
     <script>
+
         const viewSelect = document.getElementById("viewSelect");
         const mainContainer = document.querySelector(".main-container");
 

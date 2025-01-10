@@ -211,33 +211,25 @@ def registro(request):
     print("GET request to registro view")
     return render(request, 'registro.html')
 
-
 def home(request):
-    data = pd.read_csv(r"H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\mantto seq 2025.csv" ,encoding = "ISO-8859-1",usecols=['DIA','COLOR'],engine='python')
-    ''' 
-    Ejemplo de salida:
-                DIA        COLOR
-    0           NaN          NaN
-    1      1/1/2025          NaN
-    2      1/2/2025          NaN
-    3      1/3/2025          NaN
-    4      1/4/2025          NaN
-    5      1/5/2025          NaN
-    6      1/6/2025         AZUL
-    7      1/7/2025         AZUL
-    8      1/8/2025         AZUL
-    9      1/9/2025         AZUL
-    10    1/10/2025        VERDE
-    11    1/11/2025          NaN
-    12    1/12/2025          NaN
-    13    1/13/2025        VERDE
-    14    1/14/2025        VERDE
-    15    1/15/2025        VERDE
-    '''
-    context = {
-        'fecha_color': data
-    }
-    return render(request,'home.html',context)
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        data = pd.read_csv(
+            r"H:\Ingenieria\Ensamble PCB\Documentacion ISO-9001\mantto seq 2025.csv",
+            encoding="ISO-8859-1",
+            usecols=["DIA", "COLOR"],
+            engine="python"
+        )
+        # Reemplazar todos los NaN en todas las columnas
+        data = data.fillna("GHOSTWHITE")
+        # Convertir todas las columnas a cadenas para evitar problemas con objetos no serializables
+        data["DIA"] = data["DIA"].astype(str)
+        data["COLOR"] = data["COLOR"].astype(str)
+        # Convertir a lista de diccionarios
+        data_dict = data.to_dict(orient="records")
+        #print(data_dict)  # Validar JSON generado
+        return JsonResponse({"color_semana": data_dict})
+    return render(request, "home.html")
+
 
 def analisis(request):
     # Extraer todos los registros de la base de datos

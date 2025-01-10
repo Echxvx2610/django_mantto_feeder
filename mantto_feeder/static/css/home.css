@@ -162,7 +162,7 @@
 /* Media query para pantallas menores a 1500px */
 @media (max-width: 1500px) {
     .main-container {
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
     }
 
@@ -181,20 +181,6 @@
 }
 
 .day.today {
-    background-color: crimson;
     color: white;
     font-weight: bold;
 }
-
-.day.current-week {
-    background-color: #ffac98; /* gris */
-    color: white;
-    font-weight: bold;
-}
-
-.day.next-week {
-    background-color: #0ec53c; /* azul */
-    color: white;
-    font-weight: bold;
-}
-
