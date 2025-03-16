@@ -1,5 +1,8 @@
 # django_mantto_feeder
 
+>[!NOTE]
+> Actualizar Imagenes de README en subida de v.2.0
+
 ## View Home
 ![view_home](https://github.com/user-attachments/assets/a1f59560-eb0e-4717-a028-85c8128d453f)
 
