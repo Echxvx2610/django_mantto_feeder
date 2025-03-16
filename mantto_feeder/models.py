@@ -16,7 +16,7 @@ class FeederRegistro(models.Model):
     # Feeder estados
     CP = models.CharField(max_length=10, default="NG")  # 'CP'
     QP = models.CharField(max_length=10, default="NG")  # 'QP'
-    HOVER = models.CharField(max_length=10, default="NG")  # 'HOVER'
+    HOVER = models.CharField(max_length=10, default="NG")  # 'HOOVER'
     BFC = models.CharField(max_length=10, default="NG")  # 'BFC'
     
     # Fecha y hora de mantenimiento

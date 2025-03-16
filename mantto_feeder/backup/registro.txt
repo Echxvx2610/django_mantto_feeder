@@ -1,159 +1,123 @@
+<!-- registro.html -->
 {% extends "layout/base.html" %}
 
 {% block title %}Registro{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="my-5 registro">
     {% csrf_token %}
-    <div class="card border-primary mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0 text-center">Registro de Feeder</h5>
+    <h1 class="centrar titulo_principal">Registro de Feeder</h1>
+    <form id="formularioFeeder" class="row gx-3 gy-2 align-items-center" method="GET" action="/consultar/">
+        <!-- ID Feeder para consultar datos-->
+        <div class="col-md-6">
+            <label for="data" class="form-label">Data</label>
+            <input type="text" class="form-control" id="data" name="feeder_id" placeholder="Buscar por ID" maxlength="9"
+                required>
         </div>
-        <div class="card-body">
-            <form id="formularioFeeder" method="GET" action="/consultar/">
-                <!-- Barra de búsqueda -->
-                <div class="row mb-4">
-                    <div class="col-md-8">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="data" name="feeder_id" 
-                                placeholder="Buscar por ID" maxlength="9" required>
-                            <button type="button" class="btn btn-primary" onclick="fetchFeederInfo()">
-                                Buscar
-                            </button>
-                        </div>
-                    </div>
-                    <!-- <div class="col-md-4 text-end">
-                        <div id="timer-display" class="bg-light p-2 rounded border text-center">
-                            <span class="text-muted small">Tiempo: </span>
-                            <span id="time" class="fw-bold">00:00:00</span>
-                        </div>
-                    </div> -->
-                </div>
 
-                <!-- Contenido principal en dos columnas -->
-                <div class="row">
-                    <!-- Columna izquierda -->
-                    <div class="col-md-6">
-                        <!-- Información del Feeder -->
-                        <div class="mb-4">
-                            <div class="row g-3">
-                                <!-- Color de la Semana -->
-                                <div class="col-md-6">
-                                    <label for="color-semana" class="form-label">Color Semana</label>
-                                    <input type="text" class="form-control" id="color-semana" disabled />
-                                </div>
-
-                                <!-- ID_Feeder -->
-                                <div class="col-md-6">
-                                    <label for="id-feeder" class="form-label">ID_Feeder</label>
-                                    <input type="text" class="form-control" id="id-feeder" disabled />
-                                </div>
-                                
-                                <!-- Color Feeder -->
-                                <div class="col-md-6">
-                                    <label for="color-feeder" class="form-label">Color Feeder</label>
-                                    <input type="text" class="form-control" id="color-feeder" disabled />
-                                </div>
-
-                                <!-- Feeder -->
-                                <div class="col-md-6">
-                                    <label for="feeder" class="form-label">Feeder</label>
-                                    <input type="text" class="form-control" id="feeder" disabled />
-                                </div>
-                                
-                                <!-- Codigo Feeder -->
-                                <div class="col-md-6">
-                                    <label for="codigo-feeder" class="form-label">Código Feeder</label>
-                                    <input type="text" class="form-control" id="codigo-feeder" disabled />
-                                </div>
-
-                                <!-- Técnico -->
-                                <div class="col-md-6">
-                                    <label for="tecnico" class="form-label">Técnico</label>
-                                    <input type="text" class="form-control" id="tecnico" disabled />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Calibración y Status -->
-                        <div class="mb-4">
-                            <!-- Calibración -->
-                            <div class="mb-3">
-                                <label class="form-label">Calibración</label>
-                                <canvas id="calibracion-canvas" class="w-100 border rounded" height="30"></canvas>
-                            </div>
-
-                            <!-- Status -->
-                            <div class="mb-3">
-                                <label class="form-label">Status</label>
-                                <canvas id="status-canvas" class="w-100 border rounded" height="30"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Columna derecha -->
-                    <div class="col-md-6">
-                        <!-- Evaluación del Feeder -->
-                        <div class="mb-4">
-                            <div class="row g-3">
-                                <!-- CP -->
-                                <div class="col-md-6">
-                                    <label for="CP" class="form-label">CP</label>
-                                    <select id="CP" class="form-select">
-                                        <option value="NG">NG</option>
-                                        <option value="OK">OK</option>
-                                    </select>
-                                </div>
-
-                                <!-- QP -->
-                                <div class="col-md-6">
-                                    <label for="QP" class="form-label">QP</label>
-                                    <select id="QP" class="form-select">
-                                        <option value="NG">NG</option>
-                                        <option value="OK">OK</option>
-                                    </select>
-                                </div>
-
-                                <!-- Hoover -->
-                                <div class="col-md-6">
-                                    <label for="HOOVER" class="form-label">Hoover</label>
-                                    <select id="HOOVER" class="form-select">
-                                        <option value="NG">NG</option>
-                                        <option value="OK">OK</option>
-                                    </select>
-                                </div>
-
-                                <!-- BFC -->
-                                <div class="col-md-6">
-                                    <label for="BFC" class="form-label">BFC</label>
-                                    <select id="BFC" class="form-select">
-                                        <option value="NG">NG</option>
-                                        <option value="OK">OK</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Observaciones -->
-                        <div class="mb-4">
-                            <label for="observaciones" class="form-label">Observaciones</label>
-                            <textarea id="observaciones" rows="4" class="form-control" placeholder="Ingrese sus observaciones aquí..."></textarea>
-                        </div>
-
-                        <!-- Botones de acción -->
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-primary" id="calibrar-btn" style="padding:10px; width: 130px;">
-                                Calibrar
-                            </button>
-                            <button type="reset" class="btn btn-danger" id="reset-btn" style="padding:10px; width: 130px;">
-                                Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
+        <!-- Color de la Semana -->
+        <div class="col-md-6">
+            <label for="color-semana" class="form-label">Color Semana</label>
+            <input type="text" class="form-control" id="color-semana" disabled />
         </div>
-    </div>
+
+        <!-- ID_Feeder -->
+        <div class="col-md-6">
+            <label for="id-feeder" class="form-label">ID_Feeder</label>
+            <input type="text" class="form-control" id="id-feeder" disabled />
+        </div>
+        <!-- Color Feeder -->
+        <div class="col-md-6">
+            <label for="color-feeder" class="form-label">Color Feeder</label>
+            <input type="text" class="form-control" id="color-feeder" disabled />
+        </div>
+
+        <!-- Feeder -->
+        <div class="col-md-6">
+            <label for="feeder" class="form-label">Feeder</label>
+            <input type="text" class="form-control" id="feeder" disabled />
+        </div>
+        <!-- Codigo Feeder -->
+        <div class="col-md-6">
+            <label for="codigo-feeder" class="form-label">Código Feeder</label>
+            <input type="text" class="form-control" id="codigo-feeder" disabled />
+        </div>
+        <!-- Técnico -->
+        <div class="col-md-6">
+            <label for="tecnico" class="form-label">Técnico</label>
+            <input type="text" class="form-control" id="tecnico" disabled />
+        </div>
+
+        <!-- Calibración -->
+        <div class="col-md-6">
+            <label class="form-label">Calibración</label>
+            <canvas id="calibracion-canvas" class="w-100 border rounded" height="30"></canvas>
+        </div>
+
+        <!-- Status -->
+        <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <canvas id="status-canvas" class="w-100 border rounded" height="30"></canvas>
+        </div>
+
+        <!-- CP -->
+        <div class="col-md-6">
+            <label for="CP" class="form-label">CP</label>
+            <select id="CP" class="form-select">
+                <option value="NG">NG</option>
+                <option value="OK">OK</option>
+            </select>
+        </div>
+
+        <!-- QP -->
+        <div class="col-md-6">
+            <label for="QP" class="form-label">QP</label>
+            <select id="QP" class="form-select">
+                <option value="NG">NG</option>
+                <option value="OK">OK</option>
+            </select>
+        </div>
+
+        <!-- Hoover -->
+        <div class="col-md-6">
+            <label for="HOOVER" class="form-label">Hoover</label>
+            <select id="HOOVER" class="form-select">
+                <option value="NG">NG</option>
+                <option value="OK">OK</option>
+            </select>
+        </div>
+
+        <!-- BFC -->
+        <div class="col-md-6">
+            <label for="BFC" class="form-label">BFC</label>
+            <select id="BFC" class="form-select">
+                <option value="NG">NG</option>
+                <option value="OK">OK</option>
+            </select>
+        </div>
+
+        <!-- Tiempo de Captura -->
+        <!-- 
+        <div class="col-6">
+            <label for="time">Tiempo de Captura</label>
+            <input type="text" id="time" value="00:00:00" class="form-control" disabled />
+        </div> 
+        -->
+
+        <!-- Boton de Calibrar y Reset  -->
+        <div class="col-6 text-center gap-2 botones">
+            <button type="submit" class="btn btn-primary" id="calibrar-btn"
+                style="padding:10px; margin: 0 20px; width: 130px;">Calibrar</button>
+            <button type="reset" class="btn btn-danger" id="reset-btn"
+                style="padding:10px; margin:0 20px; width: 130px;">Reset</button>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="col-12">
+            <label for="observaciones" class="form-label">Observaciones</label>
+            <textarea type="text" id="observaciones" rows="4" class="form-control"></textarea>
+        </div>
+    </form>
 </div>
 
 <script>
@@ -204,9 +168,6 @@
                     cronometroId = data.id;  // Asegúrate de guardar el ID recibido
                     console.log('Cronómetro iniciado con ID:', cronometroId);
                     isTimerRunning = true;
-                    
-                    // Actualizar visualmente el estado del cronómetro
-                    //document.getElementById('timer-display').classList.add('bg-light-success');
                 } else {
                     console.error('Error al iniciar el cronómetro:', data.message);
                 }
@@ -222,9 +183,6 @@
         return new Promise((resolve, reject) => {
             if (isTimerRunning) {
                 isTimerRunning = false;
-                
-                // Actualizar visualmente el estado del cronómetro
-                //document.getElementById('timer-display').classList.remove('bg-light-success');
 
                 fetch(`/detener_cronometro/${cronometroId}/`, {
                     method: 'POST',
@@ -285,7 +243,6 @@
             text: message,
             icon: icon,
             confirmButtonText: 'Aceptar',
-            position: 'center' // Asegura que las alertas aparezcan en el centro
         });
     }
 
@@ -347,16 +304,6 @@
 
                 // Iniciar el cronómetro pasando el feederId
                 startTimer(feederId);  // Llamamos a startTimer pasando el feederId obtenido
-                
-                // Mostrar notificación de búsqueda exitosa
-                Swal.fire({
-                    position: 'center',
-                    icon: 'success',
-                    title: 'Feeder encontrado',
-                    text: 'Información cargada correctamente',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -427,7 +374,6 @@
                 text: mensajeError,
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
-                position: 'center'
             });
             return;
         }
@@ -439,7 +385,6 @@
                 text: 'Al menos un tipo de feeder debe ser "OK".',
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
-                position: 'center'
             });
             return;
         }
@@ -454,7 +399,6 @@
                 title: 'Ingrese su número de empleado',
                 input: 'text',
                 showCancelButton: true,
-                position: 'center',
                 inputValidator: (value) => {
                     if (!value) {
                         return '¡Por favor ingrese el número de empleado!';
@@ -538,12 +482,10 @@
 
         // Mensaje opcional de confirmación de reseteo usando SweetAlert
         Swal.fire({
-            position: 'center',
             title: 'Formulario reiniciado',
             text: 'Todos los campos se han restablecido.',
             icon: 'success',
-            showConfirmButton: false,
-            timer: 1500
+            confirmButtonText: 'Aceptar',
         });
     }
 
@@ -568,7 +510,6 @@
                     text: 'Reporte generado exitosamente',
                     icon: 'success',
                     confirmButtonText: 'Aceptar',
-                    position: 'center'
                 });
 
                 // Después de que la primera alerta se cierra, mostrar la de tiempo de captura
@@ -577,7 +518,6 @@
                     text: `El tiempo total de captura fue: ${tiempo_captura}`,
                     icon: 'info',
                     confirmButtonText: 'Aceptar',
-                    position: 'center'
                 });
             } else {
                 Swal.fire({
@@ -585,7 +525,6 @@
                     text: data.message,
                     icon: 'error',
                     confirmButtonText: 'Aceptar',
-                    position: 'center'
                 }).then(() => {
                     const tecnicoInput = document.getElementById('tecnico');
                     tecnicoInput.disabled = false;  // Habilitar para que el usuario lo intente de nuevo
@@ -599,7 +538,6 @@
                 text: 'Ocurrió un error al procesar los datos.',
                 icon: 'error',
                 confirmButtonText: 'Aceptar',
-                position: 'center'
             });
         }
     }
@@ -613,21 +551,6 @@
         limpiarFormulario();  // Llamamos a la función para limpiar el formulario
     });
 
-    // Agregar estilos CSS adicionales
-    document.head.insertAdjacentHTML('beforeend', `
-        <style>
-            .bg-light-success {
-                background-color: #d4edda !important;
-                border-color: #c3e6cb !important;
-                transition: background-color 0.3s ease;
-            }
-            
-            @media (max-width: 767.98px) {
-                .col-md-6 {
-                    margin-bottom: 1rem;
-                }
-            }
-        </style>
-    `);
+
 </script>
 {% endblock %}

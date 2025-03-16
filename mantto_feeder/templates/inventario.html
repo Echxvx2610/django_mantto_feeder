@@ -1,106 +1,183 @@
 {% extends "layout/base.html" %}
 
-{% block title %}Analisis{% endblock %}
+{% block title %}Inventario{% endblock %}
 
 {% load static %}
 
 {% block content %}
-<div class="my-3 analisis">
-    <h2 class="titulo_principal centrar">Inventario de Partes</h2>
-    <div class="d-flex justify-content-between mb-4">
-        <div class="input-group" style="width: 50%; padding-left:20px;">
-            <input type="text" class="form-control" placeholder="Buscar parte">
-            <button class="btn btn-outline-info" type="button">Buscar</button>
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Inventario de Partes</h5>
+                    <div>
+                        <button class="btn btn-success btn-sm" type="button">
+                            <i class="fas fa-plus-circle me-1"></i> Agregar
+                        </button>
+                        <button class="btn btn-warning btn-sm text-white" type="button">
+                            <i class="fas fa-edit me-1"></i> Editar
+                        </button>
+                        <button class="btn btn-danger btn-sm" type="button">
+                            <i class="fas fa-trash-alt me-1"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Buscar parte">
+                                <button class="btn btn-outline-primary" type="button">
+                                    <i class="fas fa-search me-1"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                        <!-- <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                            <span class="badge bg-warning text-dark me-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i> Stock Mínimo
+                            </span>
+                            <span class="badge bg-danger me-2">
+                                <i class="fas fa-exclamation-circle me-1"></i> Sin Stock
+                            </span>
+                        </div> -->
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover border">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No.PART</th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Stock Min</th>
+                                    <th>Qty</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>001</td>
+                                    <td>Tape Lift</td>
+                                    <td>Descripción para Tape Lift</td>
+                                    <td>5</td>
+                                    <td>10</td>
+                                    <td><span class="badge bg-success">Normal</span></td>
+                                </tr>
+                                <tr>
+                                    <td>002</td>
+                                    <td>Tape Up Reel</td>
+                                    <td>Descripción para Tape Up Reel</td>
+                                    <td>4</td>
+                                    <td>10</td>
+                                    <td><span class="badge bg-success">Normal</span></td>
+                                </tr>
+                                <tr>
+                                    <td>003</td>
+                                    <td>Base Feeder</td>
+                                    <td>Descripción para Base Feeder</td>
+                                    <td>10</td>
+                                    <td>20</td>
+                                    <td><span class="badge bg-success">Normal</span></td>
+                                </tr>
+                                <tr>
+                                    <td>004</td>
+                                    <td>Sensor Proximity</td>
+                                    <td>Descripción para Sensor Proximity</td>
+                                    <td>5</td>
+                                    <td>15</td>
+                                    <td><span class="badge bg-success">Normal</span></td>
+                                </tr>
+                                <tr class="table-warning">
+                                    <td>005</td>
+                                    <td>Spring</td>
+                                    <td>Descripción para Servo Motor</td>
+                                    <td>10</td>
+                                    <td>8</td>
+                                    <td><span class="badge bg-warning text-dark">Stock Mínimo</span></td>
+                                </tr>
+                                <tr>
+                                    <td>006</td>
+                                    <td>Connector SMEMA</td>
+                                    <td>Descripción para Power Supply</td>
+                                    <td>5</td>
+                                    <td>12</td>
+                                    <td><span class="badge bg-success">Normal</span></td>
+                                </tr>
+                                <tr class="table-warning">
+                                    <td>007</td>
+                                    <td>Electronic valve</td>
+                                    <td>Descripción para Control Panel</td>
+                                    <td>4</td>
+                                    <td>7</td>
+                                    <td><span class="badge bg-warning text-dark">Stock Mínimo</span></td>
+                                </tr>
+                                <tr>
+                                    <td>008</td>
+                                    <td>Cooling Fan</td>
+                                    <td>Descripción para Cooling Fan</td>
+                                    <td>5</td>
+                                    <td>18</td>
+                                    <td><span class="badge bg-success">Normal</span></td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <td>009</td>
+                                    <td>Hydraulic Pump</td>
+                                    <td>Descripción para Hydraulic Pump</td>
+                                    <td>2</td>
+                                    <td>4</td>
+                                    <td><span class="badge bg-danger">Stock Mínimo</span></td>
+                                </tr>
+                                <tr>
+                                    <td>010</td>
+                                    <td>Heat Sink</td>
+                                    <td>Descripción para Heat Sink</td>
+                                    <td>5</td>
+                                    <td>25</td>
+                                    <td><span class="badge bg-success">Normal</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p class="text-muted">Mostrando 10 de 10 partes</p>
+                        </div>
+                        <div class="col-md-6">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-end">
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                                    </li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="#">Siguiente</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-            <button class="btn btn-outline-success" type="button">Agregar</button>
-            <button class="btn btn-outline-warning" type="button">Editar</button>
-            <button class="btn btn-outline-danger" type="button" style="margin-right: 20px;">Eliminar</button>
-        </div>
-    </div>
-    <div class="table-responsive" style="padding: 20px;">
-        <table class="table table-striped table-bordered mt-4">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Stock Min</th>
-                    <th>Qty</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Tape Lift</td>
-                    <td>Descripción para Tape Lift</td>
-                    <td>5</td>
-                    <td>10</td>
-                </tr>
-                <tr>
-                    <td>Tape Up Reel</td>
-                    <td>Descripción para Tape Up Reel</td>
-                    <td>4</td>
-                    <td>10</td>
-                </tr>
-                <tr>
-                    <td>Base Feeder</td>
-                    <td>Descripción para Base Feeder</td>
-                    <td>10</td>
-                    <td>20</td>
-                </tr>
-                <tr>
-                    <td>Sensor Proximity</td>
-                    <td>Descripción para Sensor Proximity</td>
-                    <td>5</td>
-                    <td>15</td>
-                </tr>
-                <tr>
-                    <td>Spring</td>
-                    <td>Descripción para Servo Motor</td>
-                    <td>10</td>
-                    <td>8</td>
-                </tr>
-                <tr>
-                    <td>Connector SMEMA</td>
-                    <td>Descripción para Power Supply</td>
-                    <td>5</td>
-                    <td>12</td>
-                </tr>
-                <tr>
-                    <td>Electronic valve</td>
-                    <td>Descripción para Control Panel</td>
-                    <td>4</td>
-                    <td>7</td>
-                </tr>
-                <tr>
-                    <td>Cooling Fan</td>
-                    <td>Descripción para Cooling Fan</td>
-                    <td>5</td>
-                    <td>18</td>
-                </tr>
-                <tr>
-                    <td>Hydraulic Pump</td>
-                    <td>Descripción para Hydraulic Pump</td>
-                    <td>2</td>
-                    <td>4</td>
-                </tr>
-                <tr>
-                    <td>Heat Sink</td>
-                    <td>Descripción para Heat Sink</td>
-                    <td>5</td>
-                    <td>25</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </div>
+
 <script>
-    Swal.fire({
-        position: "top",
-        icon: "info",
-        title: "Alerta!",
-        text: "Se encontraron No.Parts en Stock Minimo!",
-        showConfirmButton: false,
-        timer: 1500
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            position: "top",
+            icon: "warning",
+            title: "¡Alerta de Inventario!",
+            text: "Se encontraron partes en Stock Mínimo. Revise el inventario.",
+            showConfirmButton: true,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#3085d6',
+            timer: 5000
+        });
     });
 </script>
 {% endblock %}

@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
         'MARFIL' : 'papayawhip',
         'NARANJA' : 'orangered',
         'MORADO' : 'slateblue',
-        'NEGRO' : 'black',
+        'NEGRO' : '#212121',
         'ORO' : 'gold',
         'CAFÉ' : 'saddlebrown',
         'ROSA' : 'orchid',

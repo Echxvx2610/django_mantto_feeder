@@ -1,19 +1,113 @@
 {% extends "layout/base.html" %}
 
-{% block title %}Analisis{% endblock %}
+{% block title %}Análisis{% endblock %}
 
 {% load static %}
 
 {% block content %}
-<div class="my-2 analisis">
-    <h2 class="titulo_principal centrar">Analisis Mantenimiento</h2>
-    <!-- <div id="semanaChart" style="width: 100%; height: 350px; margin: auto;"></div> -->
-    <div id="feederPorTecnicoSemanal" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
-    <!-- Nuevo gráfico de dispersión para los tiempos de captura por tipo de feeder -->
-    <div id="tiemposPorTipoFeeder" style="width: 100%; height: 350px; margin: auto; margin-top: 20px;"></div>
-    <h3>Pendiente generar grafico de barras que compare la cantidad de feeders del mes contra la cantidad actual o realizada ( por colores mensuales )</h3>    
+<div class="container mt-5">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0 text-center">Análisis de Mantenimiento</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <h3 class="display-4 text-primary">{{ total_feeders|default:"0" }}</h3>
+                                    <p class="text-muted">Total Feeders</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <h3 class="display-4 text-success">{{ porcentaje_meta|default:"0" }}%</h3>
+                                    <p class="text-muted">Cumplimiento de Meta</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <h3 class="display-4 text-warning">{{ semana_actual|default:"0" }}</h3>
+                                    <p class="text-muted">Semana Actual</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Barras Apiladas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Feeders Registrados por Técnico (Apilado por Semana)</h5>
+                </div>
+                <div class="card-body">
+                    <div id="feederPorTecnicoSemanal" style="width: 100%; height: 400px;"></div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="fas fa-info-circle me-1"></i> Datos acumulados por semana</span>
+                        <button class="btn btn-sm btn-outline-primary" onclick="exportarGrafico('feederPorTecnicoSemanal')">
+                            <i class="fas fa-download me-1"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Pastel -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Promedio de Tiempo por Tipo de Feeder (Semana Actual)</h5>
+                </div>
+                <div class="card-body">
+                    <div id="tiemposPorTipoFeeder" style="width: 100%; height: 400px;"></div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="fas fa-info-circle me-1"></i> Promedio de tiempo en minutos</span>
+                        <button class="btn btn-sm btn-outline-success" onclick="exportarGrafico('tiemposPorTipoFeeder')">
+                            <i class="fas fa-download me-1"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico Pendiente -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Comparativa Mensual de Feeders</h5>
+                </div>
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-chart-bar fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Gráfico en Desarrollo</h4>
+                    <p class="text-muted">Pendiente generar gráfico de barras que compare la cantidad de feeders del mes contra la cantidad actual o realizada (por colores mensuales)</p>
+                    <button class="btn btn-outline-warning mt-3" disabled>
+                        <i class="fas fa-cog fa-spin me-1"></i> En Construcción
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<p>{{contexto|safe}}</p>
 
 <!-- Cargar ApexCharts desde un CDN -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -27,26 +121,11 @@
     var meta = {{ meta_feeder| safe }};
     var meta_usuario = {{ meta_usuario| safe }};
     var feederTipoTiempo = {{ feeder_tipo_tiempo| safe }};  // Nuevo contexto para los tiempos de captura por tipo de feeder
-    // contexto recibido por Django
-    console.log("feedersPorSemana:", feedersPorSemana);
-    console.log("feedersPorTecnicoSemanal:", feedersPorTecnicoSemanal);
-    console.log("Semanas:", semanas);
-    console.log("Feeders Tecnico:", feedersPorTecnico);
-    console.log("Tecnicos:", tecnicos);
-    console.log("Meta:", meta);
-    console.log("Meta Usuario:", meta_usuario);
-    console.log("FeederTipoTiempo:", feederTipoTiempo);
-
-    // Calcular el valor de maxY para asegurarnos de que la meta sea visible
-    var maxY = Math.max(...feedersPorSemana, meta) + 10; // Asegúrate de que la meta sea visible, sumando un margen de 10
-    var maxY2 = Math.max(...feedersPorTecnico, meta_usuario) + 10;
-
+    
     // Mapeamos las semanas para agregar "WK" antes de cada número
     var semanasConPrefijo = semanas.map(function (semana) {
         return 'WK ' + semana;
     });
-
-    console.log("Semanas con Prefijo:", semanasConPrefijo);
 
     // 1er gráfico: Feeders Registrados por Semana
     // Preparar las series para el gráfico apilado
@@ -61,13 +140,26 @@
         series: series,  // Las series que contienen los datos por técnico
         chart: {
             type: 'bar',
-            height: 500,
+            height: 400,
             stacked: true,
+            toolbar: {
+                show: true,
+                tools: {
+                    download: true,
+                    selection: true,
+                    zoom: true,
+                    zoomin: true,
+                    zoomout: true,
+                    pan: true,
+                    reset: true
+                }
+            }
         },
         plotOptions: {
             bar: {
                 horizontal: false,
-                borderRadius: 0,
+                borderRadius: 2,
+                columnWidth: '70%',
                 dataLabels: {
                     total: {
                         enabled: true,
@@ -79,18 +171,33 @@
                 }
             }
         },
+        dataLabels: {
+            enabled: false
+        },
         xaxis: {
             categories: semanasConPrefijo,  // Las semanas como categorías en el eje X
+            labels: {
+                style: {
+                    fontSize: '12px'
+                }
+            }
         },
         yaxis: {
             title: {
                 text: 'Cantidad de Feeders',
+                style: {
+                    fontSize: '14px'
+                }
             },
             min: 0
         },
         title: {
             text: 'Feeders Registrados por Técnico (Apilado por Semana)',
             align: 'center',
+            style: {
+                fontSize: '16px',
+                fontWeight: 'bold'
+            }
         },
         annotations: {
             yaxis: [{
@@ -100,7 +207,13 @@
                     borderColor: '#FF0000',
                     style: {
                         color: 'white',
-                        background: 'crimson'
+                        background: 'crimson',
+                        padding: {
+                            left: 10,
+                            right: 10,
+                            top: 5,
+                            bottom: 5
+                        }
                     },
                     text: 'Meta Usuario: ' + meta_usuario + ' Feeders'
                 }
@@ -111,18 +224,27 @@
         },
         legend: {
             position: 'top',
-            offsetY: 0
-        }
+            offsetY: 0,
+            fontSize: '13px'
+        },
+        grid: {
+            borderColor: '#e0e0e0',
+            strokeDashArray: 5
+        },
+        tooltip: {
+            y: {
+                formatter: function (val) {
+                    return val + " feeders";
+                }
+            }
+        },
+        colors: ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336', '#3F51B5', '#009688']
     };
 
     var chart = new ApexCharts(document.querySelector("#feederPorTecnicoSemanal"), options);
     chart.render();
 
     // 2do gráfico: Representación dinámica de tipos de feeder por semana actual
-    // Datos pasados desde Django
-    var feederTipoTiempo = {{ feeder_tipo_tiempo| safe }};  // El objeto con los tiempos de captura por tipo de feeder
-    var semanaActual = {{ semana_actual| safe }};  // Semana actual proporcionada por Django
-
     // Filtrar y procesar los datos para cada tipo de feeder
     var labels = Object.keys(feederTipoTiempo);
     var series = [];
@@ -137,29 +259,68 @@
         series.push(totalTime);  // Para mostrar la sumatoria en el gráfico
         averages.push((averageTime / 60).toFixed(2));  // Convertir a minutos y redondear a 2 decimales
     });
-
+    
     // Configurar el gráfico de pastel
     var pieOptions = {
         series: series,
         labels: labels.map(function (label, index) {
-            return `${label} (Promedio: ${averages[index]} min)`; // Agregar el promedio al label
+            return `${label} (Promedio: ${averages[index]} minutos)`; // Agregar el promedio al label
         }),
         chart: {
             type: 'pie',
-            height: 550
+            height: 400,
+            toolbar: {
+                show: true,
+                tools: {
+                    download: true
+                }
+            }
         },
         title: {
             text: 'Distribución de Feeders por Tipo (Semana Actual)',
-            align: 'center'
+            align: 'center',
+            style: {
+                fontSize: '16px',
+                fontWeight: 'bold'
+            }
         },
         legend: {
-            position: 'right',
-        }
+            position: 'bottom',
+            fontSize: '13px'
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: function (val, opts) {
+                return opts.w.globals.series[opts.seriesIndex] + ' (' + val.toFixed(1) + '%)';
+            },
+            style: {
+                fontSize: '12px'
+            }
+        },
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: {
+                    height: 300
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }],
+        colors: ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336', '#3F51B5', '#009688']
     };
 
     // Renderizar el gráfico de pastel
     var pie_chart = new ApexCharts(document.querySelector("#tiemposPorTipoFeeder"), pieOptions);
     pie_chart.render();
 
+    // Función para exportar gráficos (simulada)
+    function exportarGrafico(id) {
+        //aquí iría la lógica para exportar el gráfico
+        alert('Exportando gráfico: ' + id);
+        // También podemos usar la funcionalidad nativa de ApexCharts para exportar
+        // ApexCharts tiene métodos como .exportToSVG() o .exportToPng()
+    }
 </script>
 {% endblock %}

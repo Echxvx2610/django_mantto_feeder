@@ -5,129 +5,235 @@
 {% load static %}
 
 {% block content %}
-<!-- Contenedor principal con diseño de dos columnas -->
-<div class="main-container">
-    <!-- Columna izquierda -->
-    <div class="sidebar">
-        <h3>Alertas<i class="bi bi-exclamation-lg" title="Alertas"></i></h3>
-        <ul>
-            <li><strong>Próximos eventos:</strong></li>
-            <li>Mantenimiento General: 15/01/2024</li>
-            <li>Inspección de Equipos: 20/01/2024</li>
-        </ul>
-        <h3>Notas <i class="bi bi-pencil-square" id="editNoteIcon" style="cursor: pointer;" title="Agregar Nota"></i>
-        </h3>
-        <div id="notesContainer">
-            <!-- Aquí se mostrarán las notas -->
-        </div>
-        <div id="noteFormContainer" style="display: none;">
-            <textarea id="noteInput" placeholder="Escribe una nueva nota..." style="width: 100%;"></textarea>
-            <button id="saveNoteBtn">Guardar Nota</button>
-            <button id="cancelNoteBtn">Cancelar</button>
-        </div>
-    </div>
-
-    <div>
-        <!-- Contenido principal del calendario -->
-        <div class="box_home">
-            <h2 class="titulo_principal centrar">Calendario de Mantenimiento</h2>
-        </div>
-
-        <!-- Controles del calendario -->
-        <div class="calendar-controls">
-            <button id="prevBtn">
-                << </button>
-                    <select id="viewSelect">
-                        <option value="month">Mensual</option>
-                        <option value="3months" selected>Trimestral</option>
-                        <option value="year">Anual</option>
-                    </select>
-                    <button id="nextBtn"> >></button>
-        </div>
-
-        <!-- Contenedor del calendario -->
-        <div id="calendar" class="calendar-container"></div>
-    </div>
-
-    <!-- JavaScript y CSS calendario -->
-    <script src="{% static 'js/home.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
-
-    <!-- Script personalizado para sidebar-->
-    <script>
-
-        const viewSelect = document.getElementById("viewSelect");
-        const mainContainer = document.querySelector(".main-container");
-
-        viewSelect.addEventListener("change", () => {
-            if (viewSelect.value === "month") {
-                mainContainer.style.gap = "250px";
-            } else {
-                mainContainer.style.gap = "10px";
-            }
-        });
-
-        // Referencias a elementos del DOM
-        const editNoteIcon = document.getElementById('editNoteIcon');
-        const notesContainer = document.getElementById('notesContainer');
-        const noteFormContainer = document.getElementById('noteFormContainer');
-        const noteInput = document.getElementById('noteInput');
-        const saveNoteBtn = document.getElementById('saveNoteBtn');
-        const cancelNoteBtn = document.getElementById('cancelNoteBtn');
-
-        // Función para cargar las notas guardadas
-        function loadNotes() {
-            const notes = JSON.parse(localStorage.getItem('notes')) || [];
-            notesContainer.innerHTML = notes.map((note, index) => `
-                <div class="note">
-                    <p><button class="deleteNoteBtn" data-index="${index}">X</button> ${note}</p>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Columna izquierda - Sidebar -->
+        <div class="col-md-3 mb-4">
+            <!-- Tarjeta de Alertas -->
+            <div class="card border-danger mb-4">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Avisos</h5>
+                    <i class="bi bi-exclamation-lg" title="Alertas"></i>
                 </div>
-            `).join('');
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item fw-bold">Próximos eventos:</li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-calendar-event me-2 text-danger"></i>
+                            En desarrollo...
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-tools me-2 text-warning"></i>
+                            En desarrollo...
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Notas -->
+            <div class="card border-info">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Notas</h5>
+                    <i class="bi bi-pencil-square" id="editNoteIcon" style="cursor: pointer;" title="Agregar Nota"></i>
+                </div>
+                <div class="card-body">
+                    <div id="notesContainer" class="mb-3">
+                        <!-- Aquí se mostrarán las notas -->
+                    </div>
+                    <div id="noteFormContainer" style="display: none;">
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="noteInput" placeholder="Escribe una nueva nota..." style="height: 100px"></textarea>
+                            <label for="noteInput">Nueva nota</label>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button id="cancelNoteBtn" class="btn btn-outline-secondary">Cancelar</button>
+                            <button id="saveNoteBtn" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna derecha - Calendario -->
+        <div class="col-md-9">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0 text-center">Calendario de Mantenimiento</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Controles del calendario -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <button id="prevBtn" class="btn btn-outline-primary">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </button>
+                        <div class="d-flex align-items-center width-100">
+                            <select id="viewSelect" class="form-select">
+                                <option value="month">Mensual</option>
+                                <option value="3months" selected>Trimestral</option>
+                                <option value="year">Anual</option>
+                            </select>
+                        </div>
+                        <button id="nextBtn" class="btn btn-outline-primary">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Contenedor del calendario -->
+                    <div id="calendar" class="calendar-container border rounded p-2"></div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="bi bi-info-circle me-1"></i> Utilice los controles para navegar por el calendario</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript y CSS calendario -->
+<script src="{% static 'js/home.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+<!-- Script personalizado para sidebar-->
+<script>
+    const viewSelect = document.getElementById("viewSelect");
+    
+    viewSelect.addEventListener("change", () => {
+        const calendarContainer = document.getElementById("calendar");
+        
+        if (viewSelect.value === "month") {
+            calendarContainer.style.minHeight = "500px";
+        } else if (viewSelect.value === "3months") {
+            calendarContainer.style.minHeight = "200px";
+        } else {
+            calendarContainer.style.minHeight = "800px";
         }
+        
+        // Aquí puedes agregar cualquier otra lógica que necesites para cambiar la vista
+    });
 
-        // Mostrar el formulario para agregar una nota
-        editNoteIcon.addEventListener('click', () => {
-            noteFormContainer.style.display = 'block';
-        });
+    // Referencias a elementos del DOM
+    const editNoteIcon = document.getElementById('editNoteIcon');
+    const notesContainer = document.getElementById('notesContainer');
+    const noteFormContainer = document.getElementById('noteFormContainer');
+    const noteInput = document.getElementById('noteInput');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+    const cancelNoteBtn = document.getElementById('cancelNoteBtn');
 
-        // Guardar la nueva nota
-        saveNoteBtn.addEventListener('click', () => {
-            const noteText = noteInput.value.trim();
-            if (noteText) {
-                let notes = JSON.parse(localStorage.getItem('notes')) || [];
-                notes.push(noteText);
-                localStorage.setItem('notes', JSON.stringify(notes));
+    // Función para cargar las notas guardadas
+    function loadNotes() {
+        const notes = JSON.parse(localStorage.getItem('notes')) || [];
+        
+        if (notes.length === 0) {
+            notesContainer.innerHTML = '<div class="alert alert-light text-center">No hay notas guardadas</div>';
+            return;
+        }
+        
+        notesContainer.innerHTML = notes.map((note, index) => `
+            <div class="card mb-2 border-light">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="mb-0">${note}</p>
+                        <button class="btn btn-sm btn-outline-danger deleteNoteBtn" data-index="${index}">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
 
-                // Actualizar las notas en la vista
-                loadNotes();
+    // Mostrar el formulario para agregar una nota
+    editNoteIcon.addEventListener('click', () => {
+        noteFormContainer.style.display = 'block';
+        noteInput.focus();
+    });
 
-                // Limpiar el formulario
-                noteInput.value = '';
-                noteFormContainer.style.display = 'none';
-            }
-        });
+    // Guardar la nueva nota
+    saveNoteBtn.addEventListener('click', () => {
+        const noteText = noteInput.value.trim();
+        if (noteText) {
+            let notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notes.push(noteText);
+            localStorage.setItem('notes', JSON.stringify(notes));
 
-        // Cancelar la acción de agregar una nota
-        cancelNoteBtn.addEventListener('click', () => {
+            // Actualizar las notas en la vista
+            loadNotes();
+
+            // Limpiar el formulario
             noteInput.value = '';
             noteFormContainer.style.display = 'none';
-        });
+            
+            // Mostrar notificación
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Nota guardada',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    });
 
-        // Eliminar una nota
-        notesContainer.addEventListener('click', (event) => {
-            if (event.target.classList.contains('deleteNoteBtn')) {
-                const index = event.target.getAttribute('data-index');
-                let notes = JSON.parse(localStorage.getItem('notes')) || [];
-                notes.splice(index, 1);  // Eliminar la nota en el índice correspondiente
-                localStorage.setItem('notes', JSON.stringify(notes));
+    // Cancelar la acción de agregar una nota
+    cancelNoteBtn.addEventListener('click', () => {
+        noteInput.value = '';
+        noteFormContainer.style.display = 'none';
+    });
 
-                // Actualizar las notas en la vista
-                loadNotes();
-            }
-        });
+    // Eliminar una nota
+    notesContainer.addEventListener('click', (event) => {
+        const deleteBtn = event.target.closest('.deleteNoteBtn');
+        if (deleteBtn) {
+            const index = deleteBtn.getAttribute('data-index');
+            
+            Swal.fire({
+                title: '¿Eliminar nota?',
+                text: "Esta acción no se puede deshacer",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                position: 'center'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+                    notes.splice(index, 1);  // Eliminar la nota en el índice correspondiente
+                    localStorage.setItem('notes', JSON.stringify(notes));
 
-        // Cargar las notas al cargar la página
-        loadNotes();
-    </script>
-</div>
+                    // Actualizar las notas en la vista
+                    loadNotes();
+                    
+                    // Mostrar notificación
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: 'Nota eliminada',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            });
+        }
+    });
+
+    // Cargar las notas al cargar la página
+    loadNotes();
+    
+    // Inicializar la altura del calendario según la vista seleccionada
+    document.addEventListener('DOMContentLoaded', () => {
+        const calendarContainer = document.getElementById("calendar");
+        
+        if (viewSelect.value === "month") {
+            calendarContainer.style.minHeight = "500px";
+        } else if (viewSelect.value === "3months") {
+            calendarContainer.style.minHeight = "400px";
+        } else {
+            calendarContainer.style.minHeight = "800px";
+        }
+    });
+</script>
 {% endblock %}

@@ -194,7 +194,7 @@ def registro(request):
                 tiempo=tiempo,
                 CP=data.get('CP', 'NG'),
                 QP=data.get('QP', 'NG'),
-                HOVER=data.get('HOVER', 'NG'),
+                HOVER=data.get('HOOVER', 'NG'),
                 BFC=data.get('BFC', 'NG'),
                 fecha_mantenimiento=fecha_mantenimiento
             )

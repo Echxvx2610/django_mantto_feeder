@@ -3,43 +3,755 @@
 {% block title %}Reparaciones{% endblock %}
 
 {% block content %}
-
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página en construcción</title>
 
-    <!-- Bootstrap CSS -->
-    <style>
-        .construction-container {
-            text-align: center;
-            margin-top: 50px;
+<style>
+    /* Estilos para tablas con altura fija y scroll */
+    .table-fixed-container {
+        height: 400px; /* Altura fija para las tablas */
+        overflow-y: auto; /* Scroll vertical cuando sea necesario */
+        margin-bottom: 0; /* Eliminar margen inferior */
+    }
+    
+    /* Fijar el encabezado de la tabla */
+    .table-fixed-header {
+        position: sticky;
+        top: 0;
+        background-color: #f8f9fa;
+        z-index: 1;
+    }
+    
+    /* Asegurar que el contenido de la tabla se ajuste correctamente */
+    .table-fixed-container .table {
+        margin-bottom: 0;
+    }
+    
+    /* Ajustar el ancho de las columnas para mejor visualización */
+    .table-fixed-container th,
+    .table-fixed-container td {
+        white-space: nowrap;
+    }
+    
+    /* Estilos para los botones de acción */
+    .btn-action {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        margin-right: 0.25rem;
+    }
+    
+    /* Estilos para dispositivos móviles */
+    @media (max-width: 767.98px) {
+        .table-fixed-container {
+            height: 300px; /* Altura más pequeña en móviles */
         }
+    }
+</style>
 
-        .construction-image {
-            max-width: 300px;
-            margin: 20px auto;
-        }
+<div class="container mt-5">
+    <div class="row mb-4">
+        <!-- Columna 1 - Tabla en recuadro rojo -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-danger h-100">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Feeders por Reparar</h5>
+                    <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#createFeederModal">
+                        <i class="bi bi-plus-circle"></i> Nuevo Feeder
+                    </button>
+                </div>
+                <div class="card-body p-0"> <!-- Eliminamos el padding para maximizar espacio -->
+                    <div class="table-fixed-container">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr class="table-fixed-header">
+                                    <th>ID Feeder</th>
+                                    <th>ID Refacción</th>
+                                    <th>No.parte</th>
+                                    <th>Nombre</th>
+                                    <th>Cantidad</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Técnico</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>F-1001</td>
+                                    <td>R-5432</td>
+                                    <td>NP-8765</td>
+                                    <td>Motor Servo</td>
+                                    <td>2</td>
+                                    <td><span class="badge bg-warning">En progreso</span></td>
+                                    <td>15/03/2024</td>
+                                    <td>Yamcha Cota</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1001">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1001">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1001">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1002</td>
+                                    <td>R-6789</td>
+                                    <td>NP-4321</td>
+                                    <td>Sensor Optico</td>
+                                    <td>1</td>
+                                    <td><span class="badge bg-success">Completado</span></td>
+                                    <td>12/03/2024</td>
+                                    <td>Efrain Ramirez</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1002">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1002">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1002">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1003</td>
+                                    <td>R-2345</td>
+                                    <td>NP-9876</td>
+                                    <td>Placa Base</td>
+                                    <td>1</td>
+                                    <td><span class="badge bg-secondary">Pendiente</span></td>
+                                    <td>18/03/2024</td>
+                                    <td>Carlos Bustos</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1003">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1003">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1003">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1004</td>
+                                    <td>R-7890</td>
+                                    <td>NP-5432</td>
+                                    <td>Válvula Neumática</td>
+                                    <td>3</td>
+                                    <td><span class="badge bg-warning">En progreso</span></td>
+                                    <td>14/03/2024</td>
+                                    <td>Yamcha Cota</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1004">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1004">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1004">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1005</td>
+                                    <td>R-3456</td>
+                                    <td>NP-2109</td>
+                                    <td>Correa Dentada</td>
+                                    <td>2</td>
+                                    <td><span class="badge bg-success">Completado</span></td>
+                                    <td>10/03/2024</td>
+                                    <td>Efrain Ramirez</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1005">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1005">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1005">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1006</td>
+                                    <td>R-8901</td>
+                                    <td>NP-6543</td>
+                                    <td>Fuente de Alimentación</td>
+                                    <td>1</td>
+                                    <td><span class="badge bg-secondary">Pendiente</span></td>
+                                    <td>20/03/2024</td>
+                                    <td>Carlos Bustos</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1006">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1006">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1006">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1007</td>
+                                    <td>R-4567</td>
+                                    <td>NP-3210</td>
+                                    <td>Rodamiento</td>
+                                    <td>4</td>
+                                    <td><span class="badge bg-warning">En progreso</span></td>
+                                    <td>16/03/2024</td>
+                                    <td>Yamcha Cota</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1007">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1007">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1007">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1008</td>
+                                    <td>R-9012</td>
+                                    <td>NP-7654</td>
+                                    <td>Panel de Control</td>
+                                    <td>1</td>
+                                    <td><span class="badge bg-success">Completado</span></td>
+                                    <td>11/03/2024</td>
+                                    <td>Efrain Ramirez</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1008">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1008">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1008">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1009</td>
+                                    <td>R-5678</td>
+                                    <td>NP-4321</td>
+                                    <td>Sensor de Proximidad</td>
+                                    <td>2</td>
+                                    <td><span class="badge bg-secondary">Pendiente</span></td>
+                                    <td>22/03/2024</td>
+                                    <td>Carlos Bustos</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1009">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1009">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1009">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>F-1010</td>
+                                    <td>R-0123</td>
+                                    <td>NP-8765</td>
+                                    <td>Motor Paso a Paso</td>
+                                    <td>1</td>
+                                    <td><span class="badge bg-warning">En progreso</span></td>
+                                    <td>17/03/2024</td>
+                                    <td>Yamcha Cota</td>
+                                    <td>
+                                        <button class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#viewFeederModal" data-id="F-1010">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-action" data-bs-toggle="modal" data-bs-target="#editFeederModal" data-id="F-1010">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-action" data-bs-toggle="modal" data-bs-target="#deleteFeederModal" data-id="F-1010">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">Total: 10 feeders</small>
+                </div>
+            </div>
+        </div>
 
-        .construction-text {
-            font-size: 24px;
-            color: #555;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="construction-container">
-            <img 
-                src="{% static 'img/construction.png' %}" 
-                alt="Página en construcción" 
-                class="construction-image">
-            <p class="construction-text">¡Esta página está en construcción! 🚧</p>
+        <!-- Columna 2 - Tabla en recuadro verde -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-success h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Listado de Partes Requerido</h5>
+                </div>
+                <div class="card-body p-0"> <!-- Eliminamos el padding para maximizar espacio -->
+                    <div class="table-fixed-container">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr class="table-fixed-header">
+                                    <th>ID Refacción</th>
+                                    <th>No.Part</th>
+                                    <th>Nombre</th>
+                                    <th>Costo</th>
+                                    <th>Cantidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>R-5432</td>
+                                    <td>NP-8765</td>
+                                    <td>Motor Servo</td>
+                                    <td>$1,250.00</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>R-6789</td>
+                                    <td>NP-4321</td>
+                                    <td>Sensor Optico</td>
+                                    <td>$350.00</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>R-2345</td>
+                                    <td>NP-9876</td>
+                                    <td>Placa Base</td>
+                                    <td>$850.00</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>R-7890</td>
+                                    <td>NP-5432</td>
+                                    <td>Válvula Neumática</td>
+                                    <td>$420.00</td>
+                                    <td>3</td>
+                                </tr>
+                                <tr>
+                                    <td>R-3456</td>
+                                    <td>NP-2109</td>
+                                    <td>Correa Dentada</td>
+                                    <td>$120.00</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>R-8901</td>
+                                    <td>NP-6543</td>
+                                    <td>Fuente de Alimentación</td>
+                                    <td>$580.00</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>R-4567</td>
+                                    <td>NP-3210</td>
+                                    <td>Rodamiento</td>
+                                    <td>$95.00</td>
+                                    <td>4</td>
+                                </tr>
+                                <tr>
+                                    <td>R-9012</td>
+                                    <td>NP-7654</td>
+                                    <td>Panel de Control</td>
+                                    <td>$1,100.00</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>R-5678</td>
+                                    <td>NP-4321</td>
+                                    <td>Sensor de Proximidad</td>
+                                    <td>$280.00</td>
+                                    <td>2</td>
+                                </tr>
+                                <tr>
+                                    <td>R-0123</td>
+                                    <td>NP-8765</td>
+                                    <td>Motor Paso a Paso</td>
+                                    <td>$750.00</td>
+                                    <td>1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">Total: 10 refacciones</small>
+                </div>
+            </div>
         </div>
     </div>
-</body>
-</html>
+
+    <!-- Fila 2 - Gráfico en recuadro azul -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Estadísticas de Reparaciones</h5>
+                </div>
+                <div class="card-body">
+                    <div id="chart-reparaciones" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modales para operaciones CRUD -->
+
+<!-- Modal para Ver Detalles (Read) -->
+<div class="modal fade" id="viewFeederModal" tabindex="-1" aria-labelledby="viewFeederModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="viewFeederModalLabel">Detalles del Feeder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>ID Feeder:</strong> <span id="view-id-feeder">F-1001</span></p>
+                        <p><strong>ID Refacción:</strong> <span id="view-id-refaccion">R-5432</span></p>
+                        <p><strong>No. Parte:</strong> <span id="view-no-parte">NP-8765</span></p>
+                        <p><strong>Nombre:</strong> <span id="view-nombre">Motor Servo</span></p>
+                        <p><strong>Cantidad:</strong> <span id="view-cantidad">2</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Estado:</strong> <span id="view-estado" class="badge bg-warning">En progreso</span></p>
+                        <p><strong>Fecha:</strong> <span id="view-fecha">15/03/2024</span></p>
+                        <p><strong>Técnico:</strong> <span id="view-tecnico">Yamcha Cota</span></p>
+                        <p><strong>Fecha de Creación:</strong> <span id="view-fecha-creacion">10/03/2024</span></p>
+                        <p><strong>Última Actualización:</strong> <span id="view-fecha-actualizacion">14/03/2024</span></p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Historial de Cambios</h6>
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Usuario</th>
+                                    <th>Acción</th>
+                                    <th>Detalles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>14/03/2024</td>
+                                    <td>admin</td>
+                                    <td>Actualización</td>
+                                    <td>Cambio de estado a "En progreso"</td>
+                                </tr>
+                                <tr>
+                                    <td>12/03/2024</td>
+                                    <td>yamcha</td>
+                                    <td>Actualización</td>
+                                    <td>Asignación de técnico</td>
+                                </tr>
+                                <tr>
+                                    <td>10/03/2024</td>
+                                    <td>admin</td>
+                                    <td>Creación</td>
+                                    <td>Registro inicial</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar (Update) -->
+<div class="modal fade" id="editFeederModal" tabindex="-1" aria-labelledby="editFeederModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="editFeederModalLabel">Editar Feeder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFeederForm">
+                    <div class="mb-3">
+                        <label for="edit-id-feeder" class="form-label">ID Feeder</label>
+                        <input type="text" class="form-control" id="edit-id-feeder" value="F-1001" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-id-refaccion" class="form-label">ID Refacción</label>
+                        <input type="text" class="form-control" id="edit-id-refaccion" value="R-5432">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-no-parte" class="form-label">No. Parte</label>
+                        <input type="text" class="form-control" id="edit-no-parte" value="NP-8765">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="edit-nombre" value="Motor Servo">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-cantidad" class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="edit-cantidad" value="2" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-estado" class="form-label">Estado</label>
+                        <select class="form-select" id="edit-estado">
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="En progreso" selected>En progreso</option>
+                            <option value="Completado">Completado</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="edit-fecha" value="2024-03-15">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-tecnico" class="form-label">Técnico</label>
+                        <select class="form-select" id="edit-tecnico">
+                            <option value="Yamcha Cota" selected>Yamcha Cota</option>
+                            <option value="Efrain Ramirez">Efrain Ramirez</option>
+                            <option value="Carlos Bustos">Carlos Bustos</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveEditBtn">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Eliminar (Delete) -->
+<div class="modal fade" id="deleteFeederModal" tabindex="-1" aria-labelledby="deleteFeederModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteFeederModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar el feeder <strong id="delete-id-feeder">F-1001</strong>?</p>
+                <p>Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Crear (Create) -->
+<div class="modal fade" id="createFeederModal" tabindex="-1" aria-labelledby="createFeederModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="createFeederModalLabel">Nuevo Feeder</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createFeederForm">
+                    <div class="mb-3">
+                        <label for="create-id-feeder" class="form-label">ID Feeder</label>
+                        <input type="text" class="form-control" id="create-id-feeder" placeholder="Ej. F-1011">
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-id-refaccion" class="form-label">ID Refacción</label>
+                        <input type="text" class="form-control" id="create-id-refaccion" placeholder="Ej. R-1234">
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-no-parte" class="form-label">No. Parte</label>
+                        <input type="text" class="form-control" id="create-no-parte" placeholder="Ej. NP-5678">
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="create-nombre" placeholder="Ej. Ventilador">
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-cantidad" class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="create-cantidad" value="1" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-estado" class="form-label">Estado</label>
+                        <select class="form-select" id="create-estado">
+                            <option value="Pendiente" selected>Pendiente</option>
+                            <option value="En progreso">En progreso</option>
+                            <option value="Completado">Completado</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="create-fecha">
+                    </div>
+                    <div class="mb-3">
+                        <label for="create-tecnico" class="form-label">Técnico</label>
+                        <select class="form-select" id="create-tecnico">
+                            <option value="" selected>Seleccionar técnico</option>
+                            <option value="Yamcha Cota">Yamcha Cota</option>
+                            <option value="Efrain Ramirez">Efrain Ramirez</option>
+                            <option value="Carlos Bustos">Carlos Bustos</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="saveCreateBtn">Crear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Datos para el gráfico (estos datos deberían venir del backend)
+        var datos = {
+            categorias: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            series: [
+                {
+                    name: 'Reparaciones Completadas',
+                    data: [25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
+                },
+                {
+                    name: 'Reparaciones Pendientes',
+                    data: [15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70]
+                }
+            ]
+        };
+
+        // Opciones del gráfico
+        var options = {
+            chart: {
+                type: 'bar',
+                height: 300,
+                toolbar: {
+                    show: true
+                }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    endingShape: 'rounded'
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            series: datos.series,
+            xaxis: {
+                categories: datos.categorias,
+            },
+            yaxis: {
+                title: {
+                    text: 'Cantidad'
+                }
+            },
+            fill: {
+                opacity: 1
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return val + " reparaciones"
+                    }
+                }
+            },
+            colors: ['#28a745', '#ffc107']
+        };
+
+        // Inicializar el gráfico
+        var chart = new ApexCharts(document.querySelector("#chart-reparaciones"), options);
+        chart.render();
+        
+        // Funcionalidad para los botones CRUD
+        
+        // Ver detalles
+        const viewButtons = document.querySelectorAll('[data-bs-target="#viewFeederModal"]');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const feederId = this.getAttribute('data-id');
+                document.getElementById('view-id-feeder').textContent = feederId;
+                // Aquí se cargarían los datos reales del feeder desde el backend
+                // Por ahora usamos datos de ejemplo
+            });
+        });
+        
+        // Editar
+        const editButtons = document.querySelectorAll('[data-bs-target="#editFeederModal"]');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const feederId = this.getAttribute('data-id');
+                document.getElementById('edit-id-feeder').value = feederId;
+                // Aquí se cargarían los datos reales del feeder desde el backend
+                // Por ahora usamos datos de ejemplo
+            });
+        });
+        
+        // Eliminar
+        const deleteButtons = document.querySelectorAll('[data-bs-target="#deleteFeederModal"]');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const feederId = this.getAttribute('data-id');
+                document.getElementById('delete-id-feeder').textContent = feederId;
+            });
+        });
+        
+        // Guardar cambios (editar)
+        document.getElementById('saveEditBtn').addEventListener('click', function() {
+            // Aquí se enviarían los datos al backend
+            // Por ahora solo mostramos una alerta
+            alert('Cambios guardados correctamente');
+            $('#editFeederModal').modal('hide');
+        });
+        
+        // Confirmar eliminación
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            // Aquí se enviaría la solicitud de eliminación al backend
+            // Por ahora solo mostramos una alerta
+            alert('Feeder eliminado correctamente');
+            $('#deleteFeederModal').modal('hide');
+        });
+        
+        // Crear nuevo feeder
+        document.getElementById('saveCreateBtn').addEventListener('click', function() {
+            // Aquí se enviarían los datos al backend
+            // Por ahora solo mostramos una alerta
+            alert('Feeder creado correctamente');
+            $('#createFeederModal').modal('hide');
+        });
+        
+        // Establecer la fecha actual en el formulario de creación
+        const today = new Date();
+        const formattedDate = today.toISOString().substr(0, 10);
+        document.getElementById('create-fecha').value = formattedDate;
+    });
+</script>
 {% endblock %}
