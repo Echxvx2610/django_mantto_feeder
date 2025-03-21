@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateCalendar() {
-    console.log("Actualizando calendario con colorSemana:", colorSemana);
+    //console.log("Actualizando calendario con colorSemana:", colorSemana);
     calendarEl.innerHTML = "";
     calendarEl.className = "calendar-container";
 
@@ -121,16 +121,16 @@ document.addEventListener("DOMContentLoaded", function () {
       const currentDayDate = new Date(date.getFullYear(), date.getMonth(), i);
       const formattedDate = formatDate(currentDayDate);
 
-      console.log("Comprobando fecha:", formattedDate);
+      //console.log("Comprobando fecha:", formattedDate);
       const dateData = colorSemana.find(item => {
-        console.log("Comparando con:", item.DIA, "Color:", item.COLOR);
+        //console.log("Comparando con:", item.DIA, "Color:", item.COLOR);
         return item.DIA === formattedDate;
       });
 
       if (dateData) {
-        console.log("¡Coincidencia encontrada!", formattedDate, dateData.COLOR);
+        //console.log("¡Coincidencia encontrada!", formattedDate, dateData.COLOR);
         const normalizedColor = normalizeColor(dateData.COLOR);
-        console.log("Color normalizado:", normalizedColor);
+        //console.log("Color normalizado:", normalizedColor);
         dayEl.style.backgroundColor = normalizedColor;
 
         // Ajusta el color del texto según el fondo
@@ -186,20 +186,20 @@ document.addEventListener("DOMContentLoaded", function () {
   })
     .then(response => response.json())
     .then(data => {
-      console.log("Datos recibidos del servidor:", data);
+      //console.log("Datos recibidos del servidor:", data);
       if (data.color_semana) {
         colorSemana = data.color_semana;
-        console.log("colorSemana actualizado:", colorSemana);
+        //console.log("colorSemana actualizado:", colorSemana);
 
         // Verificar el formato de las fechas
-        colorSemana.forEach(item => {
-          console.log(
-            "Fecha en datos:",
-            item.DIA,
-            "Formato esperado:",
-            formatDate(new Date(item.DIA))
-          );
-        });
+        // colorSemana.forEach(item => {
+        //   console.log(
+        //     "Fecha en datos:",
+        //     item.DIA,
+        //     "Formato esperado:",
+        //     formatDate(new Date(item.DIA))
+        //   );
+        // });
       }
       updateCalendar();
     })

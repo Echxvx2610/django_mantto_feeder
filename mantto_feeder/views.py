@@ -241,7 +241,7 @@ def analisis(request):
     
     # Meta del Feeder
     meta_feeder = 80
-    meta_usuario = 30
+    meta_usuario = 200
     
     # Crear el diccionario para guardar tipo_feeder y su respectivo tiempo
     feeder_tipo_tiempo = {

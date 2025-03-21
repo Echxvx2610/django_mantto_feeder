@@ -5,6 +5,7 @@
 {% load static %}
 
 {% block content %}
+<!-- Evaluar implementar FullCalendar para evitar conflicto de estilos-->
 <div class="container-fluid mt-4">
     <div class="row">
         <!-- Columna izquierda - Sidebar -->
@@ -42,7 +43,8 @@
                     </div>
                     <div id="noteFormContainer" style="display: none;">
                         <div class="form-floating mb-3">
-                            <textarea class="form-control" id="noteInput" placeholder="Escribe una nueva nota..." style="height: 100px"></textarea>
+                            <textarea class="form-control" id="noteInput" placeholder="Escribe una nueva nota..."
+                                style="height: 100px"></textarea>
                             <label for="noteInput">Nueva nota</label>
                         </div>
                         <div class="d-flex justify-content-end gap-2">
@@ -83,7 +85,8 @@
                 </div>
                 <div class="card-footer bg-light">
                     <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted"><i class="bi bi-info-circle me-1"></i> Utilice los controles para navegar por el calendario</span>
+                        <span class="text-muted"><i class="bi bi-info-circle me-1"></i> Utilice los controles para
+                            navegar por el calendario</span>
                     </div>
                 </div>
             </div>
@@ -98,10 +101,10 @@
 <!-- Script personalizado para sidebar-->
 <script>
     const viewSelect = document.getElementById("viewSelect");
-    
+
     viewSelect.addEventListener("change", () => {
         const calendarContainer = document.getElementById("calendar");
-        
+
         if (viewSelect.value === "month") {
             calendarContainer.style.minHeight = "500px";
         } else if (viewSelect.value === "3months") {
@@ -109,7 +112,7 @@
         } else {
             calendarContainer.style.minHeight = "800px";
         }
-        
+
         // Aquí puedes agregar cualquier otra lógica que necesites para cambiar la vista
     });
 
@@ -124,12 +127,12 @@
     // Función para cargar las notas guardadas
     function loadNotes() {
         const notes = JSON.parse(localStorage.getItem('notes')) || [];
-        
+
         if (notes.length === 0) {
             notesContainer.innerHTML = '<div class="alert alert-light text-center">No hay notas guardadas</div>';
             return;
         }
-        
+
         notesContainer.innerHTML = notes.map((note, index) => `
             <div class="card mb-2 border-light">
                 <div class="card-body py-2 px-3">
@@ -164,7 +167,7 @@
             // Limpiar el formulario
             noteInput.value = '';
             noteFormContainer.style.display = 'none';
-            
+
             // Mostrar notificación
             Swal.fire({
                 position: 'center',
@@ -187,7 +190,7 @@
         const deleteBtn = event.target.closest('.deleteNoteBtn');
         if (deleteBtn) {
             const index = deleteBtn.getAttribute('data-index');
-            
+
             Swal.fire({
                 title: '¿Eliminar nota?',
                 text: "Esta acción no se puede deshacer",
@@ -206,7 +209,7 @@
 
                     // Actualizar las notas en la vista
                     loadNotes();
-                    
+
                     // Mostrar notificación
                     Swal.fire({
                         position: 'center',
@@ -222,18 +225,23 @@
 
     // Cargar las notas al cargar la página
     loadNotes();
-    
+
     // Inicializar la altura del calendario según la vista seleccionada
     document.addEventListener('DOMContentLoaded', () => {
         const calendarContainer = document.getElementById("calendar");
-        
+
         if (viewSelect.value === "month") {
             calendarContainer.style.minHeight = "500px";
+            calendarContainer.style.zoom = "100%";  // Mantén el zoom normal
         } else if (viewSelect.value === "3months") {
-            calendarContainer.style.minHeight = "400px";
-        } else {
+            calendarContainer.style.minHeight = "300px";
+            calendarContainer.style.zoom = "100%";  // Mantén el zoom normal
+        } else if (viewSelect.value === "year") {
             calendarContainer.style.minHeight = "800px";
+            calendarContainer.style.zoom = "80%";  // Reduce el zoom a 80% para la vista anual (bug por depurar)
         }
     });
+
+
 </script>
 {% endblock %}
