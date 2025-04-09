@@ -77,7 +77,8 @@ WSGI_APPLICATION = 'app_feeder.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': r'H:\Ingenieria\SMT\Aplicaciones_python\app_feeder\data\db.sqlite3',
+        'NAME': r'db.sqlite3',
+        #'NAME': r'H:\Ingenieria\SMT\Aplicaciones_python\app_feeder\data\db.sqlite3',
     }
 }
 
