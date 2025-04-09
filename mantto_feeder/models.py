@@ -43,3 +43,40 @@ class Cronometro(models.Model):
 
     def __str__(self):
         return f"Cronómetro para Feeder {self.feeder_id}"
+
+class PartesFeeder(models.Model):
+    numero_parte = models.CharField(max_length=50, unique=True)  # Número de parte
+    nombre = models.CharField(max_length=255)  # Nombre de la parte
+    costo = models.DecimalField(max_digits=10, decimal_places=2)  # Costo de la parte
+    stock_minimo = models.IntegerField(default=0)  # Stock mínimo requerido
+    cantidad = models.IntegerField()  # Cantidad en inventario
+    estado = models.CharField(max_length=50, default="Disponible")  # Estado de la parte (ej. Disponible, En uso, etc.)
+    fecha_registro = models.DateTimeField(auto_now_add=True)  # Fecha de registro
+    
+    def __str__(self):
+        return f"No.part: {self.numero_parte} - nombre: {self.nombre} - costo: {self.costo} - stock_minimo: {self.stock_minimo} - cantidad: {self.cantidad} - estado: {self.estado} - fecha_registro: {self.fecha_registro}"
+    
+class FeederParaReparar(models.Model):
+    feeder_id = models.IntegerField()  # id-feeder
+    tamano = models.CharField(max_length=5)  # tamaño ejemplo 12x04 , 08x04, 12x02, 08x02
+    color = models.CharField(max_length=20)  # color ejemplo rojo, azul, verde, etc.
+    falla = models.CharField(max_length=255)  # falla ejemplo: no avanza, traga tape
+    parte = models.ForeignKey(PartesFeeder, on_delete=models.CASCADE)  # Relación con PartesFeeder
+    cantidad_refaccion = models.IntegerField()  # cantidad de refacciones ejemplo: 2, 3, 4, etc.
+    tecnico = models.CharField(max_length=50)  # tecnico ejemplo: Juan, Pedro, etc.
+    fecha_registro = models.DateTimeField(auto_now_add=True)  # Fecha de registro
+    
+    def __str__(self):
+        return f"Feeder ID: {self.feeder_id} - Tamaño: {self.tamano} - Falla: {self.falla} - Refacción: {self.parte.nombre} - Cantidad: {self.cantidad_refaccion}"
+    
+
+class PartesRequeridas(models.Model):
+    feeder_id = models.ForeignKey(FeederParaReparar, on_delete=models.CASCADE)  # Relación con FeederParaReparar
+    numero_parte = models.ForeignKey(PartesFeeder, on_delete=models.CASCADE,default=None)  # Relación con PartesFeeder
+    nombre = models.CharField(max_length=255) # Nombre de la parte
+    costo = models.DecimalField(max_digits=10, decimal_places=2)  # Costo de la parte
+    cantidad = models.IntegerField()  # Cantidad requerida
+    
+    def __setr__(self):
+        return f"Feeder ID: {self.feeder_id} - No. Parte: {self.numero_parte} - Nombre: {self.nombre} - Costo: {self.costo} - Cantidad: {self.cantidad}"
+    

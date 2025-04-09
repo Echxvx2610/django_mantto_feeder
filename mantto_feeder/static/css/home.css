@@ -24,7 +24,7 @@
 .calendar-controls select {
     margin: 0 10px;
     padding: 10px 10px;
-    background-color: #075964;
+    background-color: black;
     color : white;
     font-weight: bold;
     font-family: monospace;
@@ -43,10 +43,12 @@
 .month {
     margin: 10px;
     padding: 10px;
-    border: 2px solid #0c6a70;
+    /*border: 2px solid #0c6a70;*/
+    border: 2px solid gray;
     border-radius: 5px;
     box-sizing: border-box;
-    box-shadow: #0c6a70 5px 10px;
+    /*box-shadow: #0c6a70 5px 10px;*/
+    box-shadow: gray 5px 10px;
 }
 
 .month-header {

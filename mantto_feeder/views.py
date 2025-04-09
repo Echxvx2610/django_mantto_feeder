@@ -5,10 +5,13 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse,JsonResponse
 from .tools import crear_plantilla,search_feeder,validar
 from collections import defaultdict
-from .models import FeederRegistro,Cronometro
+from .forms import FeederParaRepararForm,PartesFeederForm,PartesRequeridasForm
+from .models import FeederRegistro,Cronometro,PartesFeeder,FeederParaReparar,PartesRequeridas
 import datetime
 from datetime import date,datetime
 from django.utils import timezone
+
+
 
 
 def consultar(request):
@@ -374,9 +377,85 @@ def analisis(request):
 def reparaciones(request):
     return render(request, 'reparaciones.html')
 
+def agregar_parte(request):
+    #http://localhost:8000/registro/?numero_parte=12345&nombre=Resistencia&costo=150.50&cantidad=100
+    try:    
+        if request.method == 'POST':
+            data = json.loads(request.body)
+            print("Datos recibidos POST:", data)
+            #{'partNumber','partName','partCost','partStock','partStatus','partDate'}
+            # crear el objeto PartesFeeder
+            parte = PartesFeeder(
+                numero_parte= data.get('partNumber'),
+                nombre=data.get('partName'),
+                costo=data.get('partCost'),
+                stock_minimo=data.get('partStock'),
+                cantidad=data.get('partQty'),
+                estado=data.get('partStatus'),
+                fecha_registro=data.get('partDate')
+            )
+            parte.save()
+            print("Parte guardada:", parte)
+            return JsonResponse({'success': True, 'message': 'Datos procesados correctamente.'})
+        else:
+            data = request.GET
+            print("Datos recibidos GET:", data)
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'message': 'Error al procesar los datos: JSON inválido.'}, status=400)
+    
 def inventario(request):
-    return render(request, 'inventario.html')
+    partes = PartesFeeder.objects.all()  # Obtener todos los registros de PartesFeeder
+    reparaciones = FeederParaReparar.objects.all()  # Obtener todas las reparaciones
+    partes_requeridas = PartesRequeridas.objects.all()  # Obtener todas las partes requeridas
+    for parte in partes_requeridas:
+        parte.costo = parte.costo * parte.cantidad
+    #print("Partes Requeridas:", partes_requeridas.count())
+    
+    # for parte in partes_requeridas:
+    #     print(f"Feeder ID:{parte.feeder_id.feeder_id} | {parte.cantidad}" )
+    #     if parte.feeder_id.feeder_id == 1045623:
+    #         parte.cantidad = 60
+    #         parte.save()
+    #         print("Parte actualizada")
+    
+    return render(request, 'inventario.html', {
+        'partes': partes,
+        'reparaciones': reparaciones,
+        'partes_requeridas': partes_requeridas,
+    })
 
+def registrar_reparacion_form(request):
+    if request.method == 'POST':
+        form = FeederParaRepararForm(request.POST)
+        if form.is_valid():
+            form.save()  # Guarda el registro de la reparación en la base de datos
+            return redirect('inventario')  # Redirige a la vista de inventario
+    else:
+        form = FeederParaRepararForm()
+    
+    return render(request, 'forms/registrar_reparacion.html', {'form': form})
+
+def agregar_parte_form(request):
+    if request.method == "POST":
+        form = PartesFeederForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('inventario')
+    else:
+        form = PartesFeederForm()
+    return render(request, 'forms/agregar_parte.html', {'form': form})
+  
+def agregar_parte_requerida_form(request):
+    if request.method == "POST":
+        form = PartesRequeridasForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('inventario')
+    else:
+        form = PartesRequeridasForm()
+    return render(request, 'forms/agregar_parte_requerida.html', {'form': form})
+
+  
 def reportes(request):
     return render(request, 'reportes.html')
 

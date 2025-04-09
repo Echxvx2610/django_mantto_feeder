@@ -16,4 +16,8 @@ urlpatterns = [
     path('consultar/',views.consultar ,name='consultar'),
     path('iniciar_cronometro/', views.iniciar_cronometro, name='iniciar_cronometro'),
     path('detener_cronometro/<int:cronometro_id>/', views.detener_cronometro, name='detener_cronometro'),
+    path('api/agregar_parte/',views.agregar_parte ,name='agregar_parte'),
+    path('agregar_parte_form/',views.agregar_parte_form ,name='agregar_parte_form'),
+    path('registrar_reparacion_form/', views.registrar_reparacion_form, name='registrar_reparacion_form'),
+    path('agregar_parte_requerida_form/', views.agregar_parte_requerida_form, name='agregar_parte_requerida_form'),
 ]

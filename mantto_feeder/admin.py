@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import FeederRegistro,Cronometro
+from .models import FeederRegistro,Cronometro,PartesFeeder
 
 class FeederRegistroAdmin(admin.ModelAdmin):
     # Campos que se mostrarán en la lista del admin
@@ -54,3 +54,15 @@ class CronometroAdmin(admin.ModelAdmin):
 
 # Registra el modelo con su clase de administración personalizada
 admin.site.register(Cronometro, CronometroAdmin)
+
+class PartesFeederAdmin(admin.ModelAdmin):
+    list_display = ('numero_parte', 'nombre', 'costo', 'stock_minimo', 'cantidad', 'estado', 'fecha_registro')
+    
+    # Campos por los que se puede buscar en el admin
+    search_fields = ('numero_parte', 'nombre', 'estado')
+
+    # Filtros laterales (barra lateral)
+    list_filter = ('nombre', 'fecha_registro')
+    
+admin.site.register(PartesFeeder, PartesFeederAdmin)
+
