@@ -5,8 +5,8 @@
 {% block content %}
 <div class="container mt-4">
     {% csrf_token %}
-    <div class="card border-primary mb-4">
-        <div class="card-header bg-primary text-white">
+    <div class="card border-dark mb-4">
+        <div class="card-header bg-dark text-white">
             <h5 class="mb-0 text-center">Registro de Feeder</h5>
         </div>
         <div class="card-body">
@@ -17,7 +17,7 @@
                         <div class="input-group">
                             <input type="text" class="form-control" id="data" name="feeder_id" 
                                 placeholder="Buscar por ID" maxlength="9" required>
-                            <button type="button" class="btn btn-primary" onclick="fetchFeederInfo()">
+                            <button type="button" class="btn btn-secondary" onclick="fetchFeederInfo()">
                                 Buscar
                             </button>
                         </div>
