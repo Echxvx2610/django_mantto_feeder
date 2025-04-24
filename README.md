@@ -1,16 +1,19 @@
 # django_mantto_feeder
 
 >[!NOTE]
-> Imagenes Desactualizadas,actualizare README en subida de v.2.0
-
+> Imagenes Actualizadas
 ## View Home
-![view_home](https://github.com/user-attachments/assets/a1f59560-eb0e-4717-a028-85c8128d453f)
+![image](https://github.com/user-attachments/assets/45bf2120-a0dd-4faf-b871-a741221d2d6a)
 
-## View Analisis
-![view_analisis](https://github.com/user-attachments/assets/e6b8c96e-f231-44eb-bd6a-d52f94dea0ef)
+## View Registro
+![image](https://github.com/user-attachments/assets/9c3b1052-a0b5-460f-af56-e825fb9c2004)
 
-## View Reparaciones | Reportes 
-![view_reparaciones_reportes](https://github.com/user-attachments/assets/8a0a3fdb-db9c-4732-8a78-2177c68db725)
+## View Analisis 
+![image](https://github.com/user-attachments/assets/9e16f5c6-7126-49e5-8d34-3821f17653ce)
+
+## View Reparaciones
+![image](https://github.com/user-attachments/assets/73d7ac7a-abb8-4c60-9828-5a918b336014)
 
 ## View Inventario
-![view_inventario](https://github.com/user-attachments/assets/3ae1daac-4cdb-4fbc-a1e3-0b9c68eb76f5)
+![image](https://github.com/user-attachments/assets/f69ce5ff-1883-48d7-83b7-2b453840663a)
+
